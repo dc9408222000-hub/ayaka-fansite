@@ -17,9 +17,9 @@
   --line: #ece5e8;
   --line-strong: #d8ccd2;
   --accent: #dc98ad;          /* 低彩度主色（裝飾用） */
-  --accent-strong: #b04a67;   /* 文字、連結、focus（白底對比 5.2:1） */
+  --accent-strong: #a03f5c;   /* 文字、連結、focus（白底 6.3:1、淡粉底 5.5:1） */
   --accent-soft: #fbeef2;
-  --focus: #b04a67;
+  --focus: #a03f5c;
   --header-bg: rgba(255, 255, 255, 0.86);
   --badge-bg: rgba(255, 255, 255, 0.84);
   --badge-text: #5c5560;
@@ -35,7 +35,7 @@
   --font: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", "Yu Gothic", Meiryo,
           "PingFang TC", "Microsoft JhengHei", "Noto Sans CJK JP", "Noto Sans JP", "Noto Sans TC",
           system-ui, sans-serif;
-  --font-display: "Helvetica Neue", Helvetica, Arial, "Hiragino Sans", system-ui, sans-serif;
+  --font-display: "Helvetica Neue", "Segoe UI", Helvetica, Arial, "Hiragino Sans", system-ui, sans-serif;
 
   /* 字級系統 */
   --step--2: 0.75rem;    /* 12px */
@@ -55,6 +55,7 @@
   --space-6: 3rem;
   --space-7: 4.5rem;
 
+  --dash-w: 32px;          /* 彩虹短線的長度（eyebrow、標語、頁尾共用） */
   --gutter: 16px;
   --content: 1080px;
   --measure: 38em;
@@ -99,6 +100,8 @@
 
 @media (min-width: 900px) {
   :root {
+    --step--2: 0.8125rem; /* 13px */
+    --step--1: 0.875rem;  /* 14px */
     --step-0: 1.0625rem; /* 17px */
     --step-1: 1.25rem;
     --step-2: 1.5rem;
@@ -389,10 +392,20 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 
 .hero__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75em;
   font-size: var(--step--1);
-  letter-spacing: 0.12em;
+  font-weight: 600;
+  letter-spacing: 0.16em;
   color: var(--accent-strong);
   margin-bottom: var(--space-2);
+}
+.hero__eyebrow::before {
+  content: "";
+  width: var(--dash-w); height: 2px;
+  border-radius: 2px;
+  background: var(--rainbow);
 }
 .hero__name {
   display: flex;
@@ -445,7 +458,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
   content: "";
   position: absolute;
   top: 0; left: 0;
-  width: 44px; height: 2px;
+  width: var(--dash-w); height: 2px;
   border-radius: 2px;
   background: var(--rainbow);
 }
@@ -585,7 +598,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 .eyebrow::before {
   content: "";
-  width: 24px; height: 2px;
+  width: var(--dash-w); height: 2px;
   border-radius: 2px;
   background: var(--rainbow);
 }
@@ -892,7 +905,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
   column-gap: 0.6em;
   align-items: baseline;
   margin-top: var(--space-2);
-  font-size: var(--step--1);
+  font-size: var(--step-0);
   line-height: 1.5;
 }
 .gallery__index {
@@ -1128,6 +1141,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
   padding: var(--space-6) 0 var(--space-5);
   text-align: center;
 }
+@media (min-width: 900px) {
+  .site-footer { padding: var(--space-7) 0 var(--space-6); }
+}
 .site-footer__inner {
   max-width: var(--content);
   margin: 0 auto;
@@ -1135,14 +1151,15 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 .site-footer__brand {
   font-family: var(--font-display);
-  letter-spacing: 0.24em;
+  font-size: var(--step-1);
+  letter-spacing: 0.18em;
   font-weight: 500;
   margin-bottom: var(--space-3);
 }
 .site-footer__brand::after {
   content: "";
   display: block;
-  width: 44px; height: 2px;
+  width: var(--dash-w); height: 2px;
   margin: var(--space-3) auto 0;
   border-radius: 2px;
   background: var(--rainbow);
@@ -1208,7 +1225,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .notfound__code::after {
   content: "";
   display: block;
-  width: 44px; height: 2px;
+  width: var(--dash-w); height: 2px;
   margin: var(--space-3) auto;
   border-radius: 2px;
   background: var(--rainbow);
