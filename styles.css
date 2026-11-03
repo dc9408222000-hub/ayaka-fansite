@@ -338,12 +338,12 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 .hero__glow {
   position: absolute;
-  inset: -12% -18%;
+  inset: -12% max(-18%, calc(-1 * var(--gutter)));
   background:
-    radial-gradient(45% 40% at 20% 25%, rgba(246, 185, 199, var(--glow-opacity)), transparent 70%),
-    radial-gradient(40% 36% at 80% 20%, rgba(185, 216, 242, var(--glow-opacity)), transparent 70%),
-    radial-gradient(45% 40% at 70% 85%, rgba(208, 195, 236, var(--glow-opacity)), transparent 70%),
-    radial-gradient(40% 36% at 20% 80%, rgba(244, 233, 179, var(--glow-opacity)), transparent 70%);
+    radial-gradient(45% 40% at 20% 25%, rgba(246, 185, 199, var(--glow-opacity)), transparent 60%),
+    radial-gradient(40% 36% at 80% 20%, rgba(185, 216, 242, var(--glow-opacity)), transparent 60%),
+    radial-gradient(45% 40% at 70% 85%, rgba(208, 195, 236, var(--glow-opacity)), transparent 60%),
+    radial-gradient(40% 36% at 20% 80%, rgba(244, 233, 179, var(--glow-opacity)), transparent 60%);
   filter: blur(28px);
   opacity: 0.8;
   pointer-events: none;
@@ -478,9 +478,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
 @media (min-width: 720px) {
   .hero { padding: var(--space-6) 0 var(--space-7); }
   .hero__inner {
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    grid-template-columns: minmax(0, 1fr) minmax(360px, 0.9fr);
     align-items: center;
-    gap: var(--space-6);
+    gap: var(--space-5);
   }
   .hero__text {
     order: 1;
@@ -668,7 +668,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
   .profile {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: var(--space-6);
+    column-gap: 0;
   }
   .profile__row {
     grid-column: 1 / -1;
@@ -679,7 +679,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
   .profile__row--placeholder {
     grid-column: auto;
     grid-template-columns: 7.5em minmax(0, 1fr);
-    padding: 12px 0;
+    padding: var(--space-3) var(--space-5) var(--space-3) 0;
   }
 }
 
@@ -1148,9 +1148,11 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .site-footer__line {
   font-size: var(--step--1);
   color: var(--text-muted);
-  max-width: 24em;
+  max-width: 34em;
   margin-inline: auto;
   text-wrap: balance;
+  word-break: auto-phrase;
+  line-break: strict;
 }
 .site-footer__meta {
   margin-top: var(--space-3);
