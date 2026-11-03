@@ -1,0 +1,15 @@
+{
+  "name": "ayaka-fansite",
+  "private": true,
+  "description": "AYAKA（彩花）非官方應援網站：純靜態網站，不需要建置。npm 只用來跑測試與品質檢查。",
+  "scripts": {
+    "test": "node --test",
+    "qa": "node scripts/qa.js http://127.0.0.1:8000/ qa-output",
+    "serve": "python3 -m http.server 8000",
+    "images": "python3 scripts/make_images.py"
+  },
+  "devDependencies": {
+    "axe-core": "^4.10.0",
+    "playwright": "^1.50.0"
+  }
+}
