@@ -502,10 +502,14 @@ button, a { -webkit-tap-highlight-color: transparent; }
   .hero__eyebrow { margin-bottom: var(--space-4); }
 }
 @media (min-width: 900px) {
+  .hero { padding: var(--space-7) 0; }
   .hero__inner {
     gap: var(--space-7);
-    min-height: min(calc(100vh - var(--header-h)), 720px);
+    min-height: 0;
   }
+  .hero__name-jp { font-size: var(--step-4); letter-spacing: 0.14em; }
+  .hero__name-kana { font-size: var(--step-0); }
+  .hero__slogan { font-size: var(--step-2); max-width: 20em; }
   .hero__figure { margin-right: 2.5rem; }
   .hero__kana-vertical {
     display: block;
@@ -771,10 +775,14 @@ button, a { -webkit-tap-highlight-color: transparent; }
     text-align: left;
     max-width: 680px;
   }
-  .birthday__countdown, .birthday__today { grid-column: 1; }
+  .birthday__countdown, .birthday__today { grid-column: 1; grid-row: 1; }
   .birthday__mark {
     position: static;
     grid-column: 2;
+    grid-row: 1;
+    align-self: center;
+    justify-self: end;
+    margin: 0;
     font-size: clamp(3rem, 5vw, 4.5rem);
     opacity: 0.35;
   }
