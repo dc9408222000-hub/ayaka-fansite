@@ -1,38 +1,38 @@
 # 安全稽核報告（security-audit.md）
 
-- 稽核對象：`origin/main`（目前 commit `3ea44ac`；程式碼與 `c203b68` 相同，`3ea44ac` 只改了 README）
+- 稽核對象：`origin/main`（目前 commit `fe77dce`；開發 session 於 07:22–07:25 修正 S-02、S-03、S-05 後的版本）
 - 本報告所在分支：`review-security`。稽核員只讀 `main`，不修改、不 push `main`
 - 稽核起始：2026-11-04 06:21（台灣時間）；持續到 10:45
-- 最後更新：2026-11-04 07:22（台灣時間）
+- 最後更新：2026-11-04 07:30（台灣時間）
 - 編號規則：S-01、S-02…，編號固定不重複使用；狀態為「未處理／已修正／不適用」
 - 方法：每次 `main` 有新 commit 就把快照匯出到乾淨目錄，跑靜態檢查（grep、本地規則的 semgrep、eslint + no-unsanitized/security 外掛）、圖片中繼資料檢查（Pillow／exifread／JPEG 區段解析，exiftool 在此環境裝不到）、Playwright 實際載入（console 的 CSP 違規、所有請求主機、跨來源 iframe 嵌入測試、URL／hash／localStorage 的 XSS 探針），再由人工逐行讀原始碼確認；另外用多個獨立視角重複找問題並互相反駁，只保留能用證據支持的項目
 
-## 總結（07:22 版；之後若狀態有變會更新，最後一次 push 的版本為準）
+## 總結（07:30 版；之後若狀態有變會更新，最後一次 push 的版本為準）
 
-- 稽核對象：`origin/main` @ `3ea44ac`（程式碼與 `c203b68` 相同）。完整稽核了 `index.html`、`404.html`、`app.js`、`countdown.js`、`data.js`、`styles.css`、`manifest.webmanifest`、`favicon.svg`、41 個圖片檔、`scripts/`、`test/`、`package.json`、`.gitignore`、README／SECURITY.md，以及 git 歷史與 GitHub 設定。
-- 注意：雲端 session 額度預計 08:15 用完，開發 session 可能來不及處理下面的未處理項目；每一項都已寫好可以直接照做的修法，網站主人之後自己做即可。
+- 稽核對象：`origin/main` @ `fe77dce`。完整稽核了 `index.html`、`404.html`、`app.js`、`countdown.js`、`data.js`、`styles.css`、`manifest.webmanifest`、`favicon.svg`、41 個圖片檔、`scripts/`、`test/`、`package.json`、`.gitignore`、README／SECURITY.md，以及 git 歷史與 GitHub 設定。
+- 雲端 session 額度預計 08:15 用完。開發 session 已於 07:22–07:25 依本報告修正所有可由網站端處理的項目（S-02、S-03、S-05），稽核員已逐項實測確認。
 
 | 嚴重度 | 未處理 | 已修正 | 不適用 |
 |---|---|---|---|
 | 高 | 0 | 0 | 0 |
-| 中 | 1（S-02） | 1（S-04） | 0 |
-| 低 | 3（S-01、S-03、S-05） | 0 | 0 |
+| 中 | 0 | 2（S-02、S-04） | 0 |
+| 低 | 1（S-01） | 2（S-03、S-05） | 0 |
 
-**整體風險評估：低～中。** 訪客面沒有可利用的漏洞：沒有 XSS 途徑（所有寫入都用 `textContent`，URL／hash／localStorage 的 payload 實測都進不了 DOM）、不載入任何第三方資源、兩個頁面都有以 `default-src 'none'` 為基準的 CSP、沒有 inline 程式、所有圖片都沒有 EXIF／GPS、repo 沒有任何機密。剩下的是：S-02（中）防止 iframe 嵌入的 JS 在跨來源 iframe 內實測無效，等於沒有點擊劫持防護，但本站沒有可被劫持的操作，主要風險是被整頁框進別人的網站；S-01／S-03／S-05 都是低嚴重度的帳號隱私、供應鏈與縱深防禦項目。
+**整體風險評估：低。** 訪客面沒有可利用的漏洞：沒有 XSS 途徑（所有寫入都用 `textContent`，URL／hash／localStorage 的 payload 實測都進不了 DOM，而且 CSP 現在以 Trusted Types 強制禁止 `innerHTML` 類操作）、不載入任何第三方資源、兩個頁面都有以 `default-src 'none'` 為基準的 CSP、沒有 inline 程式、所有圖片都沒有 EXIF／GPS、repo 沒有任何機密、開發用套件 `npm audit` 0 弱點。原本的中嚴重度項目 S-02（iframe 嵌入防護無效）已於 `8316767` 修正並實測有效：跨來源 iframe 內只剩一段說明與開啟連結，沒有任何內容與圖片。唯一未處理的是低嚴重度的 S-01（初始 commit 的個人 email），只能由網站主人決定是否改寫歷史。
 
-**建議處理順序**：S-02（改成「被嵌入時隱藏內容＋提供 `target="_top"` 連結」，並修正 SECURITY.md／README 的描述）→ S-05（CSP 加 `require-trusted-types-for 'script'`，一行）→ S-03（commit lockfile）→ S-01（網站主人到 GitHub 設定 email 隱私，改寫歷史與否自行決定）→「建議設定」的分支保護、2FA、Enforce HTTPS。
+**剩下要做的事**：S-01 由網站主人到 GitHub → Settings → Emails 開啟信箱隱私（改寫歷史與否自行決定）；「建議設定」一節的分支保護、2FA、開啟 Pages 後勾 Enforce HTTPS、secret scanning／Dependabot，這些都只能在 GitHub 設定頁完成。
 
 ### 無法靠靜態網站完全解決的項目：限制內最好的做法與取捨
 
 | 想要的防護 | GitHub Pages 的限制 | 限制內最好的做法 | 取捨／殘餘風險 |
 |---|---|---|---|
-| 防止被 iframe 嵌入（`X-Frame-Options`、CSP `frame-ancestors`） | 不能設定 HTTP 標頭；`<meta>` 版 CSP 會忽略 `frame-ancestors` | JS 偵測 `window.top !== window.self` 時**清空頁面、只留一段說明與 `target="_top"` 的連結**，`top.location.replace()` 只當附帶嘗試（S-02 有完整程式碼） | 無法阻止「被框」這件事，只能讓被框的頁面無用。攻擊者用 `sandbox` 關掉 JS 時防護不會執行，但本站內容全由 JS 畫出，對方也只會得到主視覺照片與空殼。Chromium 不允許沒有使用者互動的跨來源 top 導向，所以不能只靠導向 |
+| 防止被 iframe 嵌入（`X-Frame-Options`、CSP `frame-ancestors`） | 不能設定 HTTP 標頭；`<meta>` 版 CSP 會忽略 `frame-ancestors` | JS 偵測 `window.top !== window.self` 時**清空頁面、只留一段說明與 `target="_top"` 的連結**，`top.location.replace()` 只當附帶嘗試（S-02，`8316767` 已實作並實測有效） | 無法阻止「被框」這件事，只能讓被框的頁面無用。攻擊者用 `sandbox` 關掉 JS 時防護不會執行，但本站內容全由 JS 畫出，對方也只會得到主視覺照片與空殼。Chromium 不允許沒有使用者互動的跨來源 top 導向，所以不能只靠導向 |
 | 強制 HTTPS（`Strict-Transport-Security`） | 不能設定標頭、`*.github.io` 子網域無法自行 preload | Pages 設定勾 **Enforce HTTPS**（`http://` 會 301 到 `https://`）；CSP 已有 `upgrade-insecure-requests`；對外分享一律用 `https://` 網址（og:url／canonical 已是） | 訪客第一次手動輸入 `http://` 的那一次連線仍可能被攔截；github.io 是否在瀏覽器 HSTS preload 清單，此環境連不到 github.io 無法驗證，開站後可用 `curl -sI https://dc9408222000-hub.github.io/ayaka-fansite/` 查看實際標頭 |
 | CSP 違規回報（`report-uri`／`report-to`） | `<meta>` 不支援 | 本機用 `scripts/qa.js` 監聽 `securitypolicyviolation` 事件（已經有做），每次改完程式跑一次 | 線上發生的違規不會有通知；靠測試與審查 |
 | `X-Content-Type-Options`、`Permissions-Policy`、COOP／CORP 等標頭 | 不能設定 | 本站沒有使用者上傳內容、沒有用到相機／麥克風／定位等 API、沒有跨來源視窗互動，這些標頭的保護對象不存在，不需要替代方案 | 無實質殘餘風險；Pages 本身會送哪些標頭，開站後用 `curl -I` 確認即可 |
-| 防止程式碼誤用 `innerHTML`（Trusted Types） | 無限制 | CSP 加 `require-trusted-types-for 'script'`（S-05，已實測不影響功能） | 只在 Chromium 系瀏覽器生效，Firefox／Safari 會忽略；屬縱深防禦 |
+| 防止程式碼誤用 `innerHTML`（Trusted Types） | 無限制 | CSP 加 `require-trusted-types-for 'script'`（S-05，`33e1c3c` 已加入並實測不影響功能） | 只在 Chromium 系瀏覽器生效，Firefox／Safari 會忽略；屬縱深防禦 |
 | 第三方資源完整性（SRI） | 無限制 | 目前沒有任何外部資源，所以不需要；以後若要特殊字型，自架 OFL 字型子集並附授權，不要用 CDN；真的要用外部 script 時加 `integrity` 並把來源加進 CSP | — |
-| 帳號與 repo 層（2FA、分支保護、secret scanning、email 隱私） | 不是網站能解決的 | 見「建議設定」一節與 S-01 | 分支保護目前（07:22）仍未啟用 |
+| 帳號與 repo 層（2FA、分支保護、secret scanning、email 隱私） | 不是網站能解決的 | 見「建議設定」一節與 S-01 | 分支保護目前（07:30）仍未啟用 |
 | 沒有後端所以無法做的事（登入、留言表單、分析） | — | 本站刻意不做；`form-action 'none'`、`connect-src` 落在 `default-src 'none'` 都已封死 | 若之後想加留言功能，必須引入第三方服務，屆時要重新評估 CSP 與隱私 |
 
 ## 問題清單
@@ -51,7 +51,7 @@
 ### S-02　防止 iframe 嵌入的 JS 在跨來源 iframe 內無效，網站仍可被完整嵌入（點擊劫持防護沒有達成）
 
 - 嚴重度：中
-- 位置：`app.js:10-13`（`if (window.top !== window.self) { window.top.location.href = window.location.href; }` 包在 try/catch 裡）；`SECURITY.md:19`、`SECURITY.md:26`、`README.md:28`、`README.md:151`、`README.md:165`（說明與實際行為不符）；`404.html`（沒有載入任何 script，完全沒有防護，但該頁只有靜態文字）
+- 位置（`c203b68` 時）：`app.js:10-13`（`if (window.top !== window.self) { window.top.location.href = window.location.href; }` 包在 try/catch 裡）；`SECURITY.md:19`、`SECURITY.md:26`、`README.md:28`、`README.md:151`、`README.md:165`（說明與實際行為不符）；`404.html`（沒有載入任何 script，完全沒有防護，但該頁只有靜態文字）
 - 說明與影響：`cb1cb13` 時完全沒有嵌入防護；`c203b68` 加了上述 JS。但攻擊者嵌入本站時一定是**跨來源** iframe，而 Chromium 會拒絕沒有使用者互動（user activation）的跨來源 top-level 導向。實測（Chromium 153，把 `index.html` 放進另一個 port 的頁面的 `<iframe>`）：console 出現「Unsafe attempt to initiate navigation … The frame attempting navigation is targeting its top-level window, but is neither same-origin with its target nor has it received a user gesture」，丟出的 SecurityError 被 `catch (e) {}` 吞掉，頁面在 iframe 裡照常完整顯示（內文 1483 字、11 張圖片都在，可操作）。`sandbox="allow-scripts allow-same-origin"` 的 iframe 結果相同；`sandbox` 不給 allow-scripts 時 JS 完全不執行，但本站所有內容都由 JS 畫出，所以只會看到主視覺照片與空殼。同一個實驗若先在 iframe 內點一下再導向就會成功，證明差別只在 user activation。結論：目前的防護等於沒有，而 SECURITY.md／README 卻寫成已經防住，會給網站主人錯誤的安全感。實際影響：網站沒有表單、登入或任何會改變狀態的操作，點擊劫持能騙到的只有語言切換和開相簿；比較實際的風險是整站被別人的網頁框進去冒充、蓋廣告或釣魚。因此評為中而非高。
 - 具體建議修法：
   1. 偵測到被嵌入時，**先把內容藏起來、不要只靠導向**。因為 `app.js` 放在 `</body>` 前，執行時 DOM 已存在，可以在 IIFE 最前面這樣做（全部用 `createElement`／`textContent`，符合 CSP）：
@@ -72,18 +72,18 @@
      使用者點連結是有 user activation 的導向，瀏覽器允許；`replace()` 保留當作同源嵌入或某些瀏覽器下的附帶嘗試。
   2. 把 `SECURITY.md:19`、`:26` 與 `README.md:151`、`:165` 的說明改成實際行為：「被嵌入時隱藏內容並提供開啟連結；GitHub Pages 無法設定 `X-Frame-Options`／`frame-ancestors`，所以無法完全阻止被框，只能讓被框的頁面無法使用」。
   3. 驗證方式：用另一個 port（例如 `python3 -m http.server 8001`）放一個只有 `<iframe src="http://127.0.0.1:8000/">` 的頁面，打開後 iframe 裡應該只剩那一段文字與連結，點連結後整個視窗跳到本站。可以把這個檢查加進 `scripts/qa.js`。
-- 狀態：未處理（`cb1cb13` 完全沒有防護 → `c203b68` 加了 JS 但實測無效）
+- 狀態：**已修正**（`8316767`，07:22）。驗證：新版 `app.js:16-32` 在 `window.top !== window.self` 時先嘗試 `top.location.replace()`，接著清空 `body`、只用 `createElement`／`textContent` 放一段說明與 `target="_top" rel="noopener noreferrer"` 的連結，然後 `return` 不再畫任何內容；SECURITY.md 與 README 的描述已改成實際行為（含 404 頁沒有 JS 的限制）。實測（Chromium 153，跨來源 iframe，`fe77dce` 重跑一次）：一般 iframe 與 `sandbox="allow-scripts allow-same-origin"` 內都只剩 55 個字的說明與連結、0 張圖片；`sandbox` 不給 allow-scripts 時只看到 noscript 文字與主視覺照片（已在「取捨」說明）。連結的 `href` 是 `window.location.href`，一定是本站的 http(s) 網址，不會變成 `javascript:`。
 
 ### S-03　`package-lock.json` 被 `.gitignore` 排除，`npm audit` 無法執行、安裝不可重現
 
 - 嚴重度：低
-- 位置：`.gitignore:4`；`package.json:11-14`（devDependencies：`axe-core`、`playwright`）
+- 位置（`c203b68` 時）：`.gitignore:4`；`package.json:11-14`（devDependencies：`axe-core`、`playwright`）
 - 說明與影響：`package.json` 只有兩個開發用套件（品質檢查用，網站本身不需要 npm，訪客不受影響），但 `package-lock.json` 被排除，所以 (1) `npm audit` 在 repo 裡直接執行會失敗（`ENOLOCK`），(2) 每次 `npm install` 都會重新解析版本，拿到的 playwright／axe-core 版本不固定，將來某個新版若有問題也無從比對。影響範圍只有網站主人自己的電腦（執行 QA 時），所以評為低。本輪稽核以暫時產生的 lockfile 執行 `npm audit`：解析到 `playwright 1.64.1`、`playwright-core 1.64.1`、`axe-core 4.14.0`，**0 個已知弱點**。
 - 具體建議修法：
   1. 從 `.gitignore` 拿掉 `package-lock.json`，執行 `npm install --package-lock-only` 後把 lockfile commit（只有 3 個套件，檔案很小）
   2. README「測試與品質檢查」加一行 `npm audit`
   3. GitHub → Settings → Code security 開啟 Dependabot alerts（見「建議設定」）
-- 狀態：未處理
+- 狀態：**已修正**（`8316767`，07:22）。驗證：`package-lock.json`（lockfileVersion 3）已 commit，`axe-core 4.14.0`、`playwright 1.64.1`、`playwright-core 1.64.1` 都有 `resolved` 與 `integrity`；`.gitignore` 已移除該行；README 加了 `npm audit` 段落。用 commit 進來的 lockfile 執行 `npm audit`：0 個弱點。
 
 ### S-04　沒有 `.nojekyll` 時，GitHub Pages 的 Jekyll 會把 BRIEF.md／TASKS.md／README.md 轉成載入第三方 script 的網頁
 
@@ -96,12 +96,14 @@
 ### S-05　CSP 可加上 Trusted Types 強制，讓「不用 innerHTML 插入資料」由瀏覽器強制執行（縱深防禦）
 
 - 嚴重度：低
-- 位置：`index.html:6`、`404.html:6`（CSP meta）
+- 位置（`8316767` 時）：`index.html:6`、`404.html:6`（CSP meta）
 - 說明與影響：目前 `app.js` 完全沒有 HTML sink，這條規則靠人工遵守。加上 `require-trusted-types-for 'script'` 後，Chromium 會在執行期直接擋掉任何把字串指定給 `innerHTML`／`outerHTML`／`insertAdjacentHTML`／`document.write`／`eval`／`srcdoc` 等 sink 的操作（丟 TypeError 並觸發 CSP 違規事件），以後改程式時若不小心用了 innerHTML 會立刻被發現，也讓 `data.js` 被竄改時無法變成 HTML 注入。實測（Chromium 153）：把 CSP 改成 `…; upgrade-insecure-requests; require-trusted-types-for 'script'` 後載入首頁、切換到中文、開燈箱、→ 切換、Esc 關閉，全部正常，0 個 CSP 違規、0 個 console 錯誤。Firefox／Safari 目前不支援這個指令，會忽略，不影響顯示。
 - 具體建議修法：兩個 HTML 的 CSP meta 內容結尾加上 `; require-trusted-types-for 'script'`；SECURITY.md 的 CSP 列補一句說明；日後若真的需要 innerHTML，必須透過 `trustedTypes.createPolicy()` 建立政策並在 CSP 加 `trusted-types <政策名稱>`。
-- 狀態：未處理
+- 狀態：**已修正**（`33e1c3c`，07:24；目前 `fe77dce`）。驗證：`index.html:6` 與 `404.html:6` 的 CSP 結尾都加上 `; require-trusted-types-for 'script'`，SECURITY.md 補了說明與日後建立政策的做法。在真實 CSP 下實測（Chromium 153）：載入首頁、切換到中文、開燈箱、→ 切換、Esc 關閉，全部正常，`securitypolicyviolation` 事件 0 次、console 0 錯誤，`window.trustedTypes` 已啟用。
 
-## 已檢查、目前沒有發現問題的項目（`3ea44ac`／`c203b68`）
+## 已檢查、目前沒有發現問題的項目（`fe77dce`；`c203b68` 以來每個 commit 都重跑整套工具鏈，結論不變）
+
+- **`8316767`、`fe77dce` 新增的程式碼**：被嵌入時的提示（見 S-02）；導覽列目前區塊高亮 `setupNavHighlight()` 只用靜態 `href` 查 `getElementById` 並設定 `aria-current`，沒有 sink；`#birthday-mark` 改用 `data-mark` 屬性＋CSS `content: attr(data-mark)`，不是 inline style；燈箱改為 `dialog.focus()` 與 Tab 循環；都沒有安全影響。
 
 - **CSP**：`index.html:6` 與 `404.html:6` 都有 `default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests`，與基準完全一致，沒有 `'unsafe-inline'`、`'unsafe-eval'`、`*`、`data:`。meta 放在所有 `<link>` 之前。實際載入時 console 沒有任何 CSP 違規；程式用到的功能都在允許範圍內（沒有 fetch／XHR；`new Image()` 預載與 `<picture>` 的 WebP 都是同源；`canvas.toDataURL` 只用來偵測 WebP 支援，不載入資源；manifest 與 icons 同源）。
 - **inline 程式**：HTML 內沒有 inline `<script>`、`<style>`、`style=`、`on*`、`javascript:`（grep 與實際 DOM 檢查都確認）。`index.html` 的 `<svg class="brand__mark">` 只用 `fill`／`stroke` 等呈現屬性，不是 `style` 屬性，CSP 不會擋。
@@ -142,3 +144,5 @@ README 與 SECURITY.md（`547ba3c` 之後）已寫入相同的建議，這裡補
 | 07:10 | `c203b68` | TASKS 1–4 完成（SECURITY.md、404、WebP、OG、manifest、package.json）。重新稽核：S-02 有加 JS 但跨來源實測無效；新增 S-03；41 個圖片檔中繼資料全部乾淨；npm audit 0 弱點 |
 | 07:18 | `3ea44ac` | 只有 README 變更（TASKS 5）。報告更新並 push |
 | 07:22 | `3ea44ac` | 收到額度將於 08:15 用完的通知。寫入總結版、「限制內最好的做法與取捨」、S-04（已修正）、S-05；實測 Trusted Types 不影響功能 |
+| 07:25 | `8316767` | 開發 session 修正 S-02、S-03（commit 訊息「fix S-02, S-03」）。重跑工具鏈驗證：iframe 內只剩說明與連結、npm audit 0 弱點；兩項改為已修正 |
+| 07:30 | `fe77dce` | 開發 session 修正 S-05（`33e1c3c`）＋燈箱 Tab 循環。真實 CSP 下實測零違規，S-05 改為已修正；總結更新為「風險：低」，只剩 S-01 待網站主人決定 |
