@@ -411,7 +411,7 @@
       if (e.key === 'ArrowRight') { e.preventDefault(); stepPhoto(1); }
       else if (e.key === 'ArrowLeft') { e.preventDefault(); stepPhoto(-1); }
       else if (e.key === 'Escape' && state.fallbackOpen) { e.preventDefault(); closeLightbox(); }
-      else if (e.key === 'Tab' && state.fallbackOpen) { trapFocus(e); }
+      else if (e.key === 'Tab') { trapFocus(e); }   // Tab 在燈箱內循環，不會跑到瀏覽器介面
     });
 
     // 點在照片以外的暗色區域就關閉
