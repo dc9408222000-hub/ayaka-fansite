@@ -604,7 +604,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 @media (min-width: 1100px) {
   .section__inner {
     display: grid;
-    grid-template-columns: 320px minmax(0, 1fr);
+    grid-template-columns: 360px minmax(0, 1fr);
     gap: var(--space-5) var(--space-7);
     align-items: start;
   }
@@ -613,10 +613,14 @@ button, a { -webkit-tap-highlight-color: transparent; }
     position: sticky;
     top: calc(var(--header-h) + var(--space-4));
     margin-bottom: 0;
-    padding-right: var(--space-3);
+    padding-right: var(--space-4);
   }
   .section__title { font-size: var(--step-2); letter-spacing: 0.02em; text-wrap: balance; }
-  .section__lead { font-size: var(--step--1); }
+  .section__lead { font-size: var(--step-0); line-height: 1.7; }
+  /* 相簿與留言需要整個寬度：標題回到上方 */
+  #gallery .section__inner, #messages .section__inner { display: block; }
+  #gallery .section__head, #messages .section__head { position: static; margin-bottom: var(--space-5); padding-right: 0; }
+  .gallery { gap: var(--space-5) 24px; }
 }
 
 /* ---------- 個人資料 ---------- */
@@ -762,10 +766,10 @@ button, a { -webkit-tap-highlight-color: transparent; }
   .birthday {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
-    align-items: end;
+    align-items: center;
     column-gap: var(--space-6);
     text-align: left;
-    max-width: 760px;
+    max-width: 680px;
   }
   .birthday__countdown, .birthday__today { grid-column: 1; }
   .birthday__mark {
@@ -1085,6 +1089,12 @@ button, a { -webkit-tap-highlight-color: transparent; }
   line-height: 1.9;
   padding-top: var(--space-2);
 }
+.message__text--sub {
+  margin-top: var(--space-2);
+  font-size: var(--step--1);
+  line-height: 1.8;
+  color: var(--text-muted);
+}
 .message__from {
   margin-top: var(--space-3);
   font-size: var(--step--2);
@@ -1163,6 +1173,16 @@ button, a { -webkit-tap-highlight-color: transparent; }
   max-width: 36em;
   padding: var(--space-6) var(--gutter);
   text-align: center;
+}
+.notfound__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  margin-bottom: var(--space-4);
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  font-size: var(--step-1);
 }
 .notfound__code {
   font-family: var(--font-display);

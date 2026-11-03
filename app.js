@@ -450,10 +450,17 @@
     var list = qs('#messages-list');
     if (!list) { return; }
     clear(list);
+    var other = state.lang === 'zh' ? 'ja' : 'zh';
+    var from = ui('messageFrom');
     DATA.messages.forEach(function (msg) {
       var li = el('li', 'message');
       li.appendChild(el('p', 'message__text', t(msg)));
-      li.appendChild(el('p', 'message__from', ui('messageFrom')));
+      if (msg[other]) {   // 日中對照：另一種語言用小字顯示
+        var sub = el('p', 'message__text message__text--sub', msg[other]);
+        sub.setAttribute('lang', HTML_LANG[other]);
+        li.appendChild(sub);
+      }
+      if (from) { li.appendChild(el('p', 'message__from', from)); }
       list.appendChild(li);
     });
   }

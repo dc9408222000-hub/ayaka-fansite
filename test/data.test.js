@@ -24,7 +24,7 @@ function collectPairs(value, p, out) {
   return out;
 }
 
-const EMPTY_ALLOWED = [/^hero\.sloganNote$/, /^timeline\.\d+\.note$/];
+const EMPTY_ALLOWED = [/^hero\.sloganNote$/, /^timeline\.\d+\.note$/, /^ui\.messageFrom$/];
 
 test('每段文字都同時有日文（ja）與中文（zh）', () => {
   const pairs = collectPairs(DATA, '', []);
