@@ -13,7 +13,7 @@
   --surface: #ffffff;
   --surface-2: #f8f1f4;
   --text: #2b282d;
-  --text-muted: #6e6771;
+  --text-muted: #625b66;
   --line: #ece5e8;
   --line-strong: #d8ccd2;
   --accent: #dc98ad;          /* 低彩度主色（裝飾用） */
@@ -87,6 +87,8 @@
     --glow-opacity: 0.45;
     --rainbow: linear-gradient(90deg, #d79aa9 0%, #d9b98f 20%, #d2c98f 40%, #9ec7ad 60%, #94b8d6 80%, #ad9fd2 100%);
   }
+  .hero__img, .gallery__img { filter: brightness(0.9) contrast(1.02); }
+  .lightbox__img { filter: none; }
 }
 
 /* 繁體中文時優先使用台灣常見的字型，字形才會是台灣慣用的寫法 */
@@ -242,17 +244,16 @@ button, a { -webkit-tap-highlight-color: transparent; }
   margin-left: auto;
   display: inline-flex;
   padding: 3px;
-  border: 1px solid var(--line-strong);
   border-radius: 999px;
-  background: var(--surface);
+  background: var(--surface-2);
 }
 .lang-switch__btn {
   border: 0;
   background: transparent;
   border-radius: 999px;
-  padding: 0 14px;
-  min-height: 40px;
-  font-size: var(--step--1);
+  padding: 0 12px;
+  min-height: 36px;
+  font-size: var(--step--2);
   color: var(--text-muted);
   line-height: 1.4;
 }
@@ -302,18 +303,19 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 @media (min-width: 900px) {
   .site-header__inner { flex-wrap: nowrap; }
-  .site-nav { flex-basis: auto; margin: 0 auto; }
+  .site-nav { flex-basis: auto; margin: 0 0 0 auto; }
   .site-nav::after { display: none; }
   .site-nav__list { padding: 0; gap: 4px; }
   .site-nav__list a { min-height: 36px; padding: 0 12px; border-color: transparent; background: transparent; }
-  .lang-switch { margin-left: 0; }
+  .lang-switch { order: 3; margin-left: var(--space-3); }
+  .lang-switch__btn { min-height: 32px; padding: 0 10px; }
 }
 
 /* ---------- 首頁主視覺 ---------- */
 .hero {
   position: relative;
   overflow: hidden;
-  padding: var(--space-5) 0 var(--space-6);
+  padding: var(--space-3) 0 var(--space-6);
 }
 .hero__inner {
   max-width: var(--content);
@@ -328,7 +330,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
   z-index: 1;
   margin-top: -52px;
   margin-right: 28px;
-  padding: var(--space-4) var(--space-3) 0 0;
+  padding: 12px var(--space-3) 0 0;
   background: var(--bg);
   border-top-right-radius: var(--radius);
 }
@@ -349,7 +351,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .hero__frame {
   position: relative;
   aspect-ratio: 4 / 5;
-  max-height: 62vh;          /* 矮一點的手機也能在第一屏看到名字 */
+  max-height: 50vh;          /* 矮一點的手機也能在第一屏看到名字與按鈕 */
   border-radius: var(--radius);
   overflow: hidden;
   background: var(--surface-2);
@@ -390,7 +392,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
   font-size: var(--step--1);
   letter-spacing: 0.12em;
   color: var(--accent-strong);
-  margin-bottom: var(--space-3);
+  margin-bottom: var(--space-2);
 }
 .hero__name {
   display: flex;
@@ -410,16 +412,16 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .hero__name-jp {
   display: flex;
   align-items: baseline;
-  gap: 0.75em;
-  font-size: var(--step-2);
+  gap: 0.6em;
+  font-size: 1.875rem;
   font-weight: 500;
   letter-spacing: 0.12em;
 }
 .hero__name-kana {
   font-size: var(--step-0);
   font-weight: 400;
-  color: var(--text-muted);
-  letter-spacing: 0.1em;
+  color: var(--text);
+  letter-spacing: 0.2em;
 }
 .hero__name-kana::before {
   content: "";
@@ -431,13 +433,13 @@ button, a { -webkit-tap-highlight-color: transparent; }
   background: var(--line-strong);
 }
 .hero__slogan {
-  margin-top: var(--space-4);
+  margin-top: var(--space-3);
   font-size: var(--step-1);
   line-height: 1.9;
   max-width: 22em;
   position: relative;
   padding-top: var(--space-3);
-  text-wrap: balance;
+  text-wrap: pretty;
 }
 .hero__slogan::before {
   content: "";
@@ -448,7 +450,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
   background: var(--rainbow);
 }
 .hero__note { margin-top: var(--space-2); color: var(--text-muted); font-size: var(--step--1); }
-.hero__cta { margin-top: var(--space-4); }
+.hero__cta { margin-top: var(--space-3); }
 
 .link-arrow {
   display: inline-flex;
@@ -496,6 +498,8 @@ button, a { -webkit-tap-highlight-color: transparent; }
     padding: 0;
     border-radius: 0;
     background: transparent;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
     text-align: right;
   }
   .hero__name-latin { font-size: clamp(4rem, 9vw, 7.5rem); }
@@ -507,29 +511,32 @@ button, a { -webkit-tap-highlight-color: transparent; }
     gap: var(--space-7);
     min-height: 0;
   }
-  .hero__name-jp { font-size: var(--step-4); letter-spacing: 0.14em; }
+  .hero__name-latin { font-size: clamp(5rem, 8.5vw, 6.5rem); }
+  .hero__name-jp { font-size: clamp(2.5rem, 3.2vw, 3rem); letter-spacing: 0.12em; }
   .hero__name-kana { font-size: var(--step-0); }
   .hero__slogan { font-size: var(--step-2); max-width: 20em; }
   .hero__figure { margin-right: 2.5rem; }
+  .hero__figure { margin-right: 0; margin-left: 3rem; }
   .hero__kana-vertical {
     display: block;
     position: absolute;
-    top: 8px;
-    right: -2.4rem;
+    top: 0;
+    left: -3rem;
     writing-mode: vertical-rl;
     font-size: var(--step--1);
-    letter-spacing: 0.5em;
-    color: var(--text-muted);
+    letter-spacing: 0.45em;
+    color: var(--text);
     white-space: nowrap;
   }
-  .hero__kana-vertical span + span { margin-inline-start: 1.4em; }
+  .hero__kana-vertical span + span { margin-inline-start: 1.2em; }
   .hero__kana-vertical::after {
     content: "";
     display: block;
-    width: 1px;
-    height: 56px;
-    margin: 0.9em auto 0;
-    background: var(--line-strong);
+    width: 2px;
+    height: 200px;
+    margin: 1em auto 0;
+    border-radius: 2px;
+    background: var(--rainbow);
   }
 }
 
@@ -539,17 +546,11 @@ button, a { -webkit-tap-highlight-color: transparent; }
   to   { opacity: 1; transform: none; }
 }
 .hero__figure,
-.hero__eyebrow,
-.hero__name,
-.hero__slogan,
-.hero__cta {
-  animation: rise 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+.hero__text {
+  animation: rise 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
-.hero__figure  { animation-delay: 0.05s; }
-.hero__eyebrow { animation-delay: 0.25s; }
-.hero__name    { animation-delay: 0.35s; }
-.hero__slogan  { animation-delay: 0.5s; }
-.hero__cta     { animation-delay: 0.62s; }
+.hero__text { animation-delay: 0.15s; }
+.hero__caption { animation: rise 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) 0.3s both; }
 
 /* ---------- 區塊共用 ---------- */
 .section { padding: var(--space-6) 0; }
@@ -1022,9 +1023,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
   position: relative;
   width: 46px; height: 46px;
   flex: 0 0 auto;
-  border: 1px solid rgba(255, 255, 255, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.45);
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.16);
   color: #fff;
   transition: background 0.2s ease;
 }
@@ -1037,9 +1038,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 .lightbox__btn--prev::before,
 .lightbox__btn--next::before {
-  width: 11px; height: 11px;
-  border-left: 1.5px solid currentColor;
-  border-bottom: 1.5px solid currentColor;
+  width: 13px; height: 13px;
+  border-left: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
 }
 .lightbox__btn--prev::before { transform: translate(-30%, -50%) rotate(45deg); }
 .lightbox__btn--next::before { transform: translate(-70%, -50%) rotate(-135deg); }
