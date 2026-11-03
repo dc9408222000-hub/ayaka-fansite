@@ -7,14 +7,29 @@
 (function () {
   'use strict';
 
-  // 防止網站被別人用 iframe 嵌入（GitHub Pages 無法設定 X-Frame-Options，改用 JS 偵測後導回最上層）
-  try {
-    if (window.top !== window.self) { window.top.location.href = window.location.href; }
-  } catch (e) { /* 跨網域的 top 無法讀取時會丟錯，忽略即可 */ }
-
   var DATA = window.SITE_DATA;
   var Countdown = window.AyakaCountdown;
   if (!DATA || !Countdown) { return; }
+
+  // 被別的網站用 iframe 嵌入時：GitHub Pages 無法設定 X-Frame-Options／frame-ancestors，
+  // 而且瀏覽器不允許跨來源 iframe 在沒有使用者互動時導向最上層，所以改成「把內容藏起來，只留一個開啟連結」。
+  if (window.top !== window.self) {
+    try { window.top.location.replace(window.location.href); } catch (e) { /* 跨來源且沒有 user activation 時會失敗 */ }
+    var body = document.body;
+    while (body.firstChild) { body.removeChild(body.firstChild); }
+    var notice = document.createElement('p');
+    notice.className = 'framed-notice';
+    notice.textContent = DATA.ui.framedNotice.ja + '／' + DATA.ui.framedNotice.zh;
+    var link = document.createElement('a');
+    link.className = 'framed-notice__link';
+    link.href = window.location.href;
+    link.target = '_top';
+    link.rel = 'noopener noreferrer';
+    link.textContent = DATA.ui.framedOpen.ja + '／' + DATA.ui.framedOpen.zh;
+    body.appendChild(notice);
+    body.appendChild(link);
+    return;
+  }
 
   var LANGS = ['ja', 'zh'];
   var HTML_LANG = { ja: 'ja', zh: 'zh-Hant' };
@@ -195,8 +210,8 @@
     if (greetingLead) { greetingLead.textContent = fill(ui('birthdayTodayLead'), { age: s.age }); }
     var countdown = qs('#countdown');
     if (countdown) { countdown.setAttribute('aria-label', ui('countdownLabel')); }
-    var mark = qs('#birthday-mark');
-    if (mark) { mark.textContent = DATA.site.birthday.month + '.' + DATA.site.birthday.day; }
+    var mark = qs('#birthday-mark');   // 裝飾用的「6.20」，用 CSS content 顯示，不算正文
+    if (mark) { mark.setAttribute('data-mark', DATA.site.birthday.month + '.' + DATA.site.birthday.day); }
   }
 
   function tick() {

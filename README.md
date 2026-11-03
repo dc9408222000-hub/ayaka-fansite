@@ -25,7 +25,7 @@ NiziU 成員 AYAKA（彩花）的非官方粉絲網站。純 HTML / CSS / JavaSc
 | --- | --- |
 | `index.html` | 頁面骨架。文字都不寫在這裡，由 `app.js` 從 `data.js` 填入（只有 `<title>`、分享預覽的 meta、`<noscript>` 是固定文字） |
 | `styles.css` | 樣式：白色系、手機優先、字級與留白系統、深色模式、減少動態效果、404 頁 |
-| `app.js` | 把 `data.js` 的內容畫到畫面上、語言切換、生日倒數、相簿放大檢視、WebP 圖片、防 iframe 嵌入 |
+| `app.js` | 把 `data.js` 的內容畫到畫面上、語言切換、生日倒數、相簿放大檢視、WebP 圖片、被 iframe 嵌入時隱藏內容 |
 | **`data.js`** | **所有文字與資料都在這裡；要改內容只需改這個檔案** |
 | `countdown.js` | 生日倒數的計算（以日本時間 JST 為準，可在 Node 測試） |
 | `photos/` | 9 張照片（JPEG）、每張的 WebP 版本（`-480`／`-800`／`-full`）、分享預覽圖 `og.jpg`、`photos.json` |
@@ -144,11 +144,17 @@ node scripts/qa.js http://127.0.0.1:8000/ qa-output
 
 截圖與 `report.json` 會放在 `qa-output/`（已在 `.gitignore`）。
 
+檢查開發用套件有沒有已知弱點（只影響執行 QA 的電腦，網站本身不用 npm）：
+
+```bash
+npm audit
+```
+
 ## 安全說明摘要
 
 網站是純靜態、沒有後端、沒有表單、不收集任何資料，也不載入任何第三方資源。
 每個頁面都有嚴格的 Content-Security-Policy，所有程式與樣式都放在獨立檔案，寫入畫面只用 `textContent`，
-並用 JS 防止被別的網站用 iframe 嵌入。細節請看 [SECURITY.md](SECURITY.md)。
+被別的網站用 iframe 嵌入時會隱藏內容、只留下開啟連結（GitHub Pages 無法設定 frame 相關標頭，所以無法完全禁止嵌入）。細節請看 [SECURITY.md](SECURITY.md)。
 
 ## 帳號安全建議
 
@@ -162,7 +168,7 @@ node scripts/qa.js http://127.0.0.1:8000/ qa-output
 依 [TASKS.md](TASKS.md) 的順序：
 
 1. **質感與內容完整度**：字級與留白系統（CSS 變數）、白色系＋低彩度玫瑰色主色、「虹」粉彩漸層細線與主視覺光暈、桌機版區塊標題在左側固定、區塊與照片編號、主視覺（照片／AYAKA／彩花／あやか／標語）分層排版、唯一的開場動畫、深色模式另外調色；年表加入 2026-07-01《Portfolio》發行與 2026-08-23 活動；相簿每張顯示日期與說明；4 則日中對照範例留言；「關於這個網站」；頁尾最後更新日期。
-2. **安全強化**：嚴格 CSP、`no-referrer`、沒有 inline 程式與樣式、只用 `textContent` 寫入、JS 防 iframe 嵌入、`.nojekyll`、[SECURITY.md](SECURITY.md)、帳號安全建議。
+2. **安全強化**：嚴格 CSP、`no-referrer`、沒有 inline 程式與樣式、只用 `textContent` 寫入、被 iframe 嵌入時隱藏內容（S-02）、`.nojekyll`、`package-lock.json` 與 `npm audit`（S-03）、[SECURITY.md](SECURITY.md)、帳號安全建議。
 3. **品質檢查**：`scripts/qa.js` 自動截圖與檢查；`test/` 的倒數邊界測試與資料完整性測試；確認相對路徑在 `/ayaka-fansite/` 子路徑與直接開啟 `index.html` 時都正常。
 4. **載入速度與分享**：WebP 多尺寸（`<picture>`／`srcset`）、Open Graph／Twitter Card 與 `photos/og.jpg`、原創 favicon 與 manifest、`404.html`。
 5. **文件**：本 README。

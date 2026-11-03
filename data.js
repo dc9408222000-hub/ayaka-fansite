@@ -114,7 +114,9 @@ window.SITE_DATA = {
 
     footerUpdated:   { ja: '最終更新：{date}', zh: '最後更新：{date}' },
     noscript:        { ja: 'このサイトはJavaScriptを使用しています。ブラウザのJavaScriptを有効にしてご覧ください。', zh: '本網站需要啟用 JavaScript 才能正常顯示。' },
-    photoCaptionDate: { ja: '{date} 撮影', zh: '{date} 拍攝' }
+    photoCaptionDate: { ja: '{date} 撮影', zh: '{date} 拍攝' },
+    framedNotice:    { ja: 'このページは別のサイトに埋め込まれています。', zh: '本頁被嵌入在其他網站中。' },
+    framedOpen:      { ja: 'AYAKA応援サイトを開く', zh: '開啟網站' }
   },
 
   /* ---------- 個人資料 ----------

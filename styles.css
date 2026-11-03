@@ -708,6 +708,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
   pointer-events: none;
   user-select: none;
 }
+.birthday__mark::before { content: attr(data-mark); }
 .birthday { margin-left: 0; }
 .birthday__lead { color: var(--text-muted); font-size: var(--step--1); letter-spacing: 0.04em; }
 .countdown {
@@ -1183,3 +1184,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .notfound__title + .notfound__title { font-size: var(--step-1); color: var(--text-muted); font-weight: 500; margin-top: var(--space-1); }
 .notfound__text { margin-top: var(--space-3); color: var(--text-muted); }
 .notfound__links { margin-top: var(--space-4); display: flex; justify-content: center; gap: var(--space-4); flex-wrap: wrap; }
+
+/* ---------- 被 iframe 嵌入時的提示 ---------- */
+.framed-notice { margin: var(--space-5) var(--gutter) var(--space-3); text-align: center; color: var(--text-muted); }
+.framed-notice__link { display: block; text-align: center; font-weight: 600; }
