@@ -1,15 +1,15 @@
 # 安全稽核報告（security-audit.md）
 
-- 稽核對象：`origin/main`（目前 commit `f04b377`，網站程式碼與 `77a7653` 相同；S-02、S-03、S-05 已於 `8316767`／`33e1c3c` 修正，之後的 commit 都重新驗證過）
+- 稽核對象：`origin/main`（目前 commit `c1391aa`，JS／HTML 與 `77a7653` 相同，之後只改了 CSS 版面與文件；S-02、S-03、S-05 已於 `8316767`／`33e1c3c` 修正，之後的 commit 都重新驗證過）
 - 本報告所在分支：`review-security`。稽核員只讀 `main`，不修改、不 push `main`
 - 稽核起始：2026-11-04 06:21（台灣時間）；持續到 10:45
-- 最後更新：2026-11-04 07:34（台灣時間）
+- 最後更新：2026-11-04 07:38（台灣時間）
 - 編號規則：S-01、S-02…，編號固定不重複使用；狀態為「未處理／已修正／不適用」
 - 方法：每次 `main` 有新 commit 就把快照匯出到乾淨目錄，跑靜態檢查（grep、本地規則的 semgrep、eslint + no-unsanitized/security 外掛）、圖片中繼資料檢查（Pillow／exifread／JPEG 區段解析，exiftool 在此環境裝不到）、Playwright 實際載入（console 的 CSP 違規、所有請求主機、跨來源 iframe 嵌入測試、URL／hash／localStorage 的 XSS 探針），再由人工逐行讀原始碼確認；另外用多個獨立視角重複找問題並互相反駁，只保留能用證據支持的項目
 
-## 總結（07:34 版；之後若狀態有變會更新，最後一次 push 的版本為準）
+## 總結（07:38 版；之後若狀態有變會更新，最後一次 push 的版本為準）
 
-- 稽核對象：`origin/main` @ `f04b377`（程式碼同 `77a7653`）。完整稽核了 `index.html`、`404.html`、`app.js`、`countdown.js`、`data.js`、`styles.css`、`manifest.webmanifest`、`favicon.svg`、41 個圖片檔、`scripts/`、`test/`、`package.json`、`.gitignore`、README／SECURITY.md，以及 git 歷史與 GitHub 設定。
+- 稽核對象：`origin/main` @ `c1391aa`（JS／HTML 同 `77a7653`）。完整稽核了 `index.html`、`404.html`、`app.js`、`countdown.js`、`data.js`、`styles.css`、`manifest.webmanifest`、`favicon.svg`、41 個圖片檔、`scripts/`、`test/`、`package.json`、`.gitignore`、README／SECURITY.md，以及 git 歷史與 GitHub 設定。
 - 雲端 session 額度預計 08:15 用完。開發 session 已於 07:22–07:25 依本報告修正所有可由網站端處理的項目（S-02、S-03、S-05），稽核員已逐項實測確認。
 
 | 嚴重度 | 未處理 | 已修正 | 不適用 |
@@ -149,3 +149,4 @@ README 與 SECURITY.md（`547ba3c` 之後）已寫入相同的建議，這裡補
 | 07:30 | `fe77dce` | 開發 session 修正 S-05（`33e1c3c`）＋燈箱 Tab 循環。真實 CSP 下實測零違規，S-05 改為已修正；總結更新為「風險：低」，只剩 S-01 待網站主人決定 |
 | 07:34 | `77a7653` | 設計／文案修正（D-13～D-37）。重跑整套工具鏈與 CSP 下的互動測試：沒有新問題，既有結論不變 |
 | 07:34 | `f04b377` | 只改 README（審查狀態摘要）與開發用 `scripts/qa.js`（網頁不載入），網站程式碼未變；不需重跑 |
+| 07:38 | `c1391aa` | 只改 `styles.css` 版面（新增的規則沒有 url()／@import），與安全無關 |
