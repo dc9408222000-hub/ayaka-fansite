@@ -11,7 +11,7 @@
 
 | 項目 | 做法 | 用途 |
 | --- | --- | --- |
-| Content-Security-Policy | `index.html`／`404.html` 的 `<meta http-equiv="Content-Security-Policy">`：`default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests` | 只允許載入同一網站的指令碼、樣式、圖片、字型與 manifest；其他來源一律封鎖。就算哪天不小心混入外部內容或注入攻擊，瀏覽器也不會執行。`base-uri 'none'` 防止被竄改相對路徑的基準，`form-action 'none'` 禁止任何表單送出，`upgrade-insecure-requests` 把 `http://` 自動升級成 `https://`。 |
+| Content-Security-Policy | `index.html`／`404.html` 的 `<meta http-equiv="Content-Security-Policy">`：`default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests; require-trusted-types-for 'script'` | 只允許載入同一網站的指令碼、樣式、圖片、字型與 manifest；其他來源一律封鎖。就算哪天不小心混入外部內容或注入攻擊，瀏覽器也不會執行。`base-uri 'none'` 防止被竄改相對路徑的基準，`form-action 'none'` 禁止任何表單送出，`upgrade-insecure-requests` 把 `http://` 自動升級成 `https://`。`require-trusted-types-for 'script'` 讓瀏覽器（Chromium）在執行期直接擋掉 `innerHTML`、`document.write`、`eval` 等會把字串變成 HTML／程式的操作，確保「不用 innerHTML」這條規則由瀏覽器強制執行；日後若真的需要，必須用 `trustedTypes.createPolicy()` 建立政策並在 CSP 加上 `trusted-types <名稱>`。 |
 | 沒有 inline 程式與樣式 | 所有 JavaScript 與 CSS 都放在獨立檔案；HTML 裡沒有 `<script>…</script>`、`<style>`、`style="…"`、`onclick` 等屬性 | 配合上面的 CSP：inline 程式碼本來就會被封鎖，網站本身也不依賴它們 |
 | 只用 `textContent`／`createElement` 寫入畫面 | `app.js` 把 `data.js` 的資料畫到畫面時不使用 `innerHTML` | 資料裡就算含有 `<`、`>` 等字元，也只會被當成文字顯示，不會變成 HTML（防 XSS） |
 | Referrer 政策 | `<meta name="referrer" content="no-referrer">` | 訪客從本站點到任何地方時，不會把本站網址當作來源送出 |

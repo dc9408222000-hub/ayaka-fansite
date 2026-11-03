@@ -168,7 +168,7 @@ npm audit
 依 [TASKS.md](TASKS.md) 的順序：
 
 1. **質感與內容完整度**：字級與留白系統（CSS 變數）、白色系＋低彩度玫瑰色主色、「虹」粉彩漸層細線與主視覺光暈、桌機版區塊標題在左側固定、區塊與照片編號、主視覺（照片／AYAKA／彩花／あやか／標語）分層排版、唯一的開場動畫、深色模式另外調色；年表加入 2026-07-01《Portfolio》發行與 2026-08-23 活動；相簿每張顯示日期與說明；4 則日中對照範例留言；「關於這個網站」；頁尾最後更新日期。
-2. **安全強化**：嚴格 CSP、`no-referrer`、沒有 inline 程式與樣式、只用 `textContent` 寫入、被 iframe 嵌入時隱藏內容（S-02）、`.nojekyll`、`package-lock.json` 與 `npm audit`（S-03）、[SECURITY.md](SECURITY.md)、帳號安全建議。
+2. **安全強化**：嚴格 CSP、`no-referrer`、沒有 inline 程式與樣式、只用 `textContent` 寫入、被 iframe 嵌入時隱藏內容（S-02）、`.nojekyll`（S-04）、`package-lock.json` 與 `npm audit`（S-03）、CSP 加上 Trusted Types 強制（S-05）、[SECURITY.md](SECURITY.md)、帳號安全建議。
 3. **品質檢查**：`scripts/qa.js` 自動截圖與檢查；`test/` 的倒數邊界測試與資料完整性測試；確認相對路徑在 `/ayaka-fansite/` 子路徑與直接開啟 `index.html` 時都正常。
 4. **載入速度與分享**：WebP 多尺寸（`<picture>`／`srcset`）、Open Graph／Twitter Card 與 `photos/og.jpg`、原創 favicon 與 manifest、`404.html`。
 5. **文件**：本 README。
