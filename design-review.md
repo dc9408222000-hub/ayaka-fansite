@@ -3,13 +3,13 @@
 - 審查員：獨立設計審查 session（本分支 `review-design`，不改動 `main`）
 - 審查對象：`origin/main` 上的網站（目前審到 commit c1391aa）
 - 報告格式：每個問題一個條目，編號固定不重複使用；狀態分「未處理／已修正／不適用」；優先度「高」且「未處理」的請先處理
-- 最後更新：2026-11-04 07:41（台灣時間）
+- 最後更新：2026-11-04 07:42（台灣時間）
 
 ## 總結與整體評分
 
 **整體評分：7.5 / 10**（07:41 版，以 main c1391aa 為準；修掉 D-38 的色帶與 D-51 的數字溢出即可回到 8，之後每輪會更新）
 
-**目前狀態**：51 項中 36 項已修正；未處理 15 項：高 1（**D-38** 桌面版照片下方的 backdrop-filter 色帶，一行 CSS 可修）、中 6（D-39 語言切換過重、D-40 「彩花」在手機版層級太弱、D-41 375 第一屏 CTA 被切半、D-47 頁尾在平板以上拆字斷行、D-48 平板主視覺照片比手機小、**D-51** 桌面倒數數字溢出格子）、低 8（D-32、D-42～D-46、D-49、D-50）；D-37 已加註但需網站主人確認。
+**目前狀態**：58 項中 36 項已修正；未處理 22 項：高 1（**D-38** 桌面版照片下方的 backdrop-filter 色帶，一行 CSS 可修）、中 6（D-39 語言切換過重、D-40 「彩花」在手機版層級太弱、D-41 375 第一屏 CTA 被切半、D-47 頁尾在平板以上拆字斷行、D-48 平板主視覺照片比手機小、**D-51** 桌面倒數數字溢出格子）、低 15（D-32、D-42～D-46、D-49、D-50、D-52～D-58 設計系統收斂）；D-37 已加註但需網站主人確認。
 
 **做得好的地方**：設計變數（色彩、字級 8 階、留白、圓角、陰影）建立得完整，白底＋低彩度粉主色＋「虹」漸層細線的點綴克制而一致；手機版主視覺「照片＋疊上去的名字卡」有層次、不像模板，品牌列捲走只留導覽列固定、導覽有目前區塊高亮與淡出提示；深色模式是另外調色而不是反轉，全站量測沒有任何 WCAG AA 不及格的文字；跳到主要內容、焦點環、燈箱焦點管理（Esc 後回到縮圖）、reduced-motion、lazy loading／WebP、OG 分享圖都到位；日文自然、中文是台灣用語且日中對照完整；三輪 37 項在 30 分鐘內處理完，修法多半優於建議（相簿首張滿版、留言日中對照、404 品牌識別）。
 
@@ -42,6 +42,7 @@
 | 07:36 | e05afcc | 第一眼印象與色彩兩個面向的交叉審查結果（查證者逐條確認）：新增 D-38～D-46，其中 D-38 為高優先；評分暫調 7.5/10 |
 | 07:38 | e05afcc | 768／1440 全頁重新截圖確認 77a7653 沒有造成跑版；各寬度版面面向的交叉審查結果：新增 D-47～D-50 |
 | 07:41 | c1391aa | 確認 D-16 已修正、桌面主視覺不再有大片空白（D-06）、「彩花」桌面版 44px（D-40 手機版未處理）；新增 D-51（桌面倒數數字溢出格子） |
+| 07:42 | c1391aa | 設計系統一致性面向的交叉審查結果（查證者逐條確認，已剔除已修正與重複項）：新增 D-52～D-58（皆為低優先的收斂項） |
 
 ## 問題清單
 
@@ -394,3 +395,51 @@
 - 建議：桌面版格子最小寬度 88px（.countdown { grid-template-columns: repeat(4, minmax(88px, 1fr)); gap: 12px }），或把數字在 900px 以上固定為 36px（--step-4 以下）；裝飾欄讓位：.birthday 的 grid-template-columns 改 minmax(0,1fr) minmax(0, 160px)，或在 1100px 以下隱藏裝飾欄。
 - 依據：（e05afcc）：格子 693–750px、數字 683–760px；styles.css .countdown__num{font-size:clamp(1.5rem, 1rem + 3.6vw, 2.75rem)}、.countdown__tile{padding:14px 4px 12px}、@media(min-width:900px) .birthday{grid-template-columns:minmax(0,1fr) auto}
 - 紀錄：07:40（main c1391aa 確認仍存在） 發現
+### D-52 ｜ 優先度：低 ｜ 狀態：未處理
+- 位置：全站／1280／1440／兩者
+- 現況：--step-0～4 在 ≥900px 放大（16→17、28→32、36→44），但 --step--1／--step--2 固定 13／12px，桌機時小字與內文的比例從 0.81 降到 0.76；.gallery__caption 13px/1.5 在 325px 寬的照片下是每格唯一的主文字卻偏小；同一種「灰色小標／日期」有六種字級×字距組合（profile__label、timeline__date、gallery__date、countdown__unit、message__from、site-footer__meta）。
+- 建議：在 @media (min-width: 900px) 補 --step--1: 0.875rem（14px）、--step--2: 0.8125rem（13px）；相簿說明改用 --step-0；抽一個 .meta { font-size: var(--step--2); color: var(--text-muted); letter-spacing: .06em; font-variant-numeric: tabular-nums } 給六處共用。
+- 依據：summary.md 1280-light-ja font sizes：13、12 未放大；
+- 紀錄：07:42（main c1391aa；設計系統一致性面向的交叉審查，查證者逐條確認） 發現
+
+### D-53 ｜ 優先度：低 ｜ 狀態：未處理
+- 位置：全站／全部／兩者
+- 現況：--rainbow 以三種形狀出現：3px 全寬條（頁首、生日卡）、24×2px 短線（eyebrow）、44×2px 短線（主視覺標語、頁尾字標、404）。使用本身克制，但 24 與 44 沒有比例關係，眼睛會讀成兩種元件。
+- 建議：短線統一一個變數 --dash-w: 32px（或 28px）供 eyebrow、標語、頁尾、404 共用；全寬條維持 3px；頁尾若想更長就用 2 倍（64px）。
+- 依據：（44px）與 （24px）；styles.css .eyebrow::before、.hero__slogan::before、.site-footer__brand::after
+- 紀錄：07:42（main c1391aa；設計系統一致性面向的交叉審查，查證者逐條確認） 發現
+
+### D-54 ｜ 優先度：低 ｜ 狀態：未處理
+- 位置：導覽列／頁尾／全部／兩者
+- 現況：.brand__name 19px（桌機 20px）、字距 0.18em；.site-footer__brand 沒設字級、繼承 16／17px、字距 0.24em。整份 CSS 的 letter-spacing 共 25 處、11 種值（0.02／0.04／0.06／0.08／0.1／0.12／0.16／0.18／0.22／0.24／0.5em），沒有 token。
+- 建議：抽一個 .wordmark { font-family: var(--font-display); font-size: var(--step-1); letter-spacing: .2em; font-weight: 500 } 給頁首、頁尾、404 共用；字距收斂成三個 token：--track-s .04em（標題、數字）、--track-m .08em（小標、日期）、--track-l .2em（eyebrow、字標），直排假名的 0.5em 可保留。
+- 依據：；styles.css .brand__name／.site-footer__brand
+- 紀錄：07:42（main c1391aa；設計系統一致性面向的交叉審查，查證者逐條確認） 發現
+
+### D-55 ｜ 優先度：低 ｜ 狀態：未處理
+- 位置：導覽列／全部／淺色
+- 現況：語言切換鈕的選取態與導覽 chips 的 hover／aria-current 都是 #b04a67 字 on #fbeef2 底、13px，對比 4.63:1（AA 下限 4.5）；CSS 註解只寫「白底 5.2:1」，沒有考慮 soft 底。深色模式對應組合（#eaa8bb on #342a31）約 7.1:1 沒問題。
+- 建議：--accent-strong（與 --focus）改 #a03f5c：白底約 6.3:1、#fbeef2 底約 5.5:1；或把 --accent-soft 改更淡的 #fdf5f8 拉開差距。
+- 依據：summary.md 各淺色變體 AA-pass-but-below-7：button.lang-switch__btn #b04a67/#fbeef2=4.63；styles.css :root 註解
+- 紀錄：07:42（main c1391aa；設計系統一致性面向的交叉審查，查證者逐條確認） 發現
+
+### D-56 ｜ 優先度：低 ｜ 狀態：未處理
+- 位置：首頁主視覺／全部／兩者
+- 現況：.hero__eyebrow：13px、字重 400、字距 0.12em、內文字型、沒有彩虹短線也沒有編號；.eyebrow：12px、字重 600、字距 0.22em、大寫、display 字型、前綴 24×2px 彩虹線＋「01」編號。兩者功能相同（標題上方的小標），首屏卻與其後六個區塊的節奏對不上。
+- 建議：首頁直接套用 .eyebrow（可加編號「00」或不加），日文不受 uppercase 影響；或至少在 .hero__eyebrow 補 ::before 的 24×2px 彩虹線、字重 600、字距 0.16em，字級維持 13px。
+- 依據：與 對照；styles.css .hero__eyebrow 與 .eyebrow
+- 紀錄：07:42（main c1391aa；設計系統一致性面向的交叉審查，查證者逐條確認） 發現
+
+### D-57 ｜ 優先度：低 ｜ 狀態：未處理
+- 位置：首頁主視覺／生日倒數／全部／兩者
+- 現況：--font-display 是 "Helvetica Neue", Helvetica, Arial, …，.hero__name-latin 與 .countdown__num 都設 font-weight: 300。Mac／iOS 的 Helvetica Neue 有 Light，但 Windows 沒有 Helvetica Neue、Helvetica 會被替換成 Arial，而 Arial 沒有 300，瀏覽器改用 400：115px 的「AYAKA」與 44px 的倒數數字在 Windows 會比設計明顯粗一截，與「輕、透」的風格不一致（這是字重可得性，不是審查環境的渲染差異）。
+- 建議：在 Arial 前加入有 Light 字重的 Windows 系統字型："Helvetica Neue", "Segoe UI", Helvetica, Arial, …（Segoe UI 有 300 Light）；或把主視覺大字改成 400、字距從 0.16em 放到 0.2em 維持輕盈感。
+- 依據：styles.css --font-display、.hero__name-latin{font-weight:300}、.countdown__num{font-weight:300}
+- 紀錄：07:42（main c1391aa；設計系統一致性面向的交叉審查，查證者逐條確認） 發現
+
+### D-58 ｜ 優先度：低 ｜ 狀態：未處理
+- 位置：頁尾／1280／1440／兩者
+- 現況：.section 在 ≥900px 改為上下 72px，.site-footer 卻固定 padding 48px 0 32px：桌機時關於區塊底部 72px、頁尾頂部 48px，border-top 線上下不對稱；頁尾底部 32px 比任何區塊都緊。
+- 建議：.site-footer 改 padding: var(--space-6) 0 var(--space-5)，並在 ≥900px 改 var(--space-7) 0 var(--space-6)，與區塊同步縮放。
+- 依據：頁尾；styles.css .site-footer{padding}
+- 紀錄：07:42（main c1391aa；設計系統一致性面向的交叉審查，查證者逐條確認） 發現
