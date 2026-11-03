@@ -89,7 +89,7 @@ window.SITE_DATA = {
     timelineTitle:   { ja: 'ヒストリー', zh: '年表' },
     timelineLead:    { ja: '確認できている出来事から、少しずつ書き足していきます。', zh: '從已確認的事件開始，之後慢慢補上。' },
     dateUnknown:     { ja: '日付：準備中', zh: '日期：待補' },
-    timelinePlaceholder: { ja: 'ここに新しい出来事を追加できます（data.js の timeline を編集）', zh: '可以在這裡加入新的事件（編輯 data.js 的 timeline）' },
+    timelinePlaceholder: { ja: 'これからの出来事も、ここに書き足していきます。', zh: '之後的事件會陸續補上。' },
 
     galleryTitle:    { ja: 'フォト', zh: '相簿' },
     galleryLead:     { ja: '2026年8月23日、イベント会場で撮影した写真です。タップすると大きく表示できます。', zh: '2026 年 8 月 23 日在活動現場拍攝的照片，點一下可以放大瀏覽。' },

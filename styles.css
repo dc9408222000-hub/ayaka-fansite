@@ -217,6 +217,9 @@ button {
   font-size: var(--step-1);
 }
 .brand__sub { font-size: var(--step--2); color: var(--text-muted); letter-spacing: 0.04em; }
+@media (max-width: 479px) {
+  .brand__sub { display: none; }
+}
 
 .lang-switch {
   margin-left: auto;
@@ -284,7 +287,16 @@ button {
   display: grid;
   gap: var(--space-4);
 }
-.hero__text { order: 2; }
+.hero__text {
+  order: 2;
+  position: relative;
+  z-index: 1;
+  margin-top: -52px;
+  margin-right: 28px;
+  padding: var(--space-4) var(--space-3) 0 0;
+  background: var(--bg);
+  border-top-right-radius: var(--radius);
+}
 .hero__figure { order: 1; position: relative; }
 
 .hero__glow {
@@ -309,13 +321,18 @@ button {
 }
 .hero__img { width: 100%; height: 100%; object-fit: cover; }
 .hero__caption {
-  position: relative;
-  margin-top: var(--space-2);
-  font-size: var(--step--2);
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 1;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
   color: var(--text-muted);
+  font-size: var(--step--2);
   letter-spacing: 0.04em;
-  text-align: right;
   font-variant-numeric: tabular-nums;
+  line-height: 1.6;
 }
 
 .hero__eyebrow {
@@ -369,6 +386,7 @@ button {
   max-width: 22em;
   position: relative;
   padding-top: var(--space-3);
+  text-wrap: balance;
 }
 .hero__slogan::before {
   content: "";
@@ -402,18 +420,61 @@ button {
 .link-arrow:hover::after { transform: translateY(2px) rotate(45deg); }
 .link-arrow:hover { text-decoration: underline; }
 
-@media (min-width: 900px) {
+.hero__kana-vertical { display: none; }
+
+@media (min-width: 720px) {
   .hero { padding: var(--space-6) 0 var(--space-7); }
   .hero__inner {
     grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
     align-items: center;
+    gap: var(--space-6);
+  }
+  .hero__text {
+    order: 1;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    border-radius: 0;
+  }
+  .hero__figure { order: 2; max-width: 460px; justify-self: end; width: 100%; }
+  .hero__caption {
+    position: relative;
+    top: auto; right: auto;
+    margin-top: var(--space-2);
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+    text-align: right;
+  }
+  .hero__name-latin { font-size: clamp(4rem, 9vw, 7.5rem); }
+  .hero__eyebrow { margin-bottom: var(--space-4); }
+}
+@media (min-width: 900px) {
+  .hero__inner {
     gap: var(--space-7);
     min-height: calc(100vh - var(--header-h));
   }
-  .hero__text { order: 1; }
-  .hero__figure { order: 2; max-width: 460px; justify-self: end; width: 100%; }
-  .hero__name-latin { font-size: clamp(5rem, 9vw, 7.5rem); }
-  .hero__eyebrow { margin-bottom: var(--space-4); }
+  .hero__figure { margin-right: 2.5rem; }
+  .hero__kana-vertical {
+    display: block;
+    position: absolute;
+    top: 8px;
+    right: -2.4rem;
+    writing-mode: vertical-rl;
+    font-size: var(--step--1);
+    letter-spacing: 0.5em;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+  .hero__kana-vertical span + span { margin-inline-start: 1.4em; }
+  .hero__kana-vertical::after {
+    content: "";
+    display: block;
+    width: 1px;
+    height: 56px;
+    margin: 0.9em auto 0;
+    background: var(--line-strong);
+  }
 }
 
 /* 唯一的開場動畫 */
