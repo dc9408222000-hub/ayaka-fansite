@@ -35,6 +35,10 @@
 </head>
 <body>
   <a class="skip-link" href="#main" data-ui="skipLink"></a>
+  <noscript>
+    <p class="noscript" lang="ja">このサイトはJavaScriptを使用しています。ブラウザのJavaScriptを有効にしてご覧ください。</p>
+    <p class="noscript" lang="zh-Hant">本網站需要啟用 JavaScript 才能正常顯示。</p>
+  </noscript>
 
   <header class="site-header">
     <div class="site-header__inner">
@@ -86,7 +90,7 @@
           <div class="hero__frame">
             <picture>
               <source id="hero-source" type="image/webp" srcset="photos/ayaka-07-480.webp 480w, photos/ayaka-07-800.webp 800w, photos/ayaka-07-full.webp 1280w" sizes="(min-width: 720px) 460px, 92vw">
-              <img class="hero__img" id="hero-img" src="photos/ayaka-07.jpg" alt="" width="1280" height="1600" loading="eager" fetchpriority="high" decoding="async">
+              <img class="hero__img" id="hero-img" src="photos/ayaka-07.jpg" alt="満面の笑顔" width="1280" height="1600" loading="eager" fetchpriority="high" decoding="async">
             </picture>
           </div>
           <p class="hero__kana-vertical" aria-hidden="true"><span data-hero="nameKana"></span><span data-hero="name"></span></p>
@@ -187,10 +191,9 @@
     </div>
   </footer>
 
-  <dialog class="lightbox" id="lightbox" data-ui-aria-label="lightboxLabel">
+  <dialog class="lightbox" id="lightbox" data-ui-aria-label="lightboxLabel" tabindex="-1">
     <div class="lightbox__bar">
       <p class="lightbox__counter" id="lightbox-counter"></p>
-      <button type="button" class="lightbox__btn lightbox__btn--close" id="lightbox-close"><span class="visually-hidden" data-ui="lightboxClose"></span></button>
     </div>
     <figure class="lightbox__figure">
       <div class="lightbox__stage" id="lightbox-stage">
@@ -204,17 +207,14 @@
         <span class="lightbox__caption-date" id="lightbox-date"></span>
       </figcaption>
     </figure>
+    <p class="lightbox__hint lightbox__hint--keys" data-ui="lightboxHint"></p>
+    <p class="lightbox__hint lightbox__hint--touch" data-ui="lightboxHintTouch"></p>
     <div class="lightbox__nav">
       <button type="button" class="lightbox__btn lightbox__btn--prev" id="lightbox-prev"><span class="visually-hidden" data-ui="lightboxPrev"></span></button>
-      <p class="lightbox__hint" data-ui="lightboxHint"></p>
+      <button type="button" class="lightbox__btn lightbox__btn--close" id="lightbox-close"><span class="visually-hidden" data-ui="lightboxClose"></span></button>
       <button type="button" class="lightbox__btn lightbox__btn--next" id="lightbox-next"><span class="visually-hidden" data-ui="lightboxNext"></span></button>
     </div>
   </dialog>
-
-  <noscript>
-    <p class="noscript" lang="ja">このサイトはJavaScriptを使用しています。ブラウザのJavaScriptを有効にしてご覧ください。</p>
-    <p class="noscript" lang="zh-Hant">本網站需要啟用 JavaScript 才能正常顯示。</p>
-  </noscript>
 
   <script src="data.js"></script>
   <script src="countdown.js"></script>

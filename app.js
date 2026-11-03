@@ -152,7 +152,7 @@
     if (!list) { return; }
     clear(list);
     DATA.profile.forEach(function (row) {
-      var wrap = el('div', 'profile__row');
+      var wrap = el('div', 'profile__row' + (row.value == null ? ' profile__row--placeholder' : ''));
       wrap.appendChild(el('dt', 'profile__label', t(row.label)));
       var dd = el('dd', 'profile__value');
       if (row.value == null) {
@@ -161,7 +161,7 @@
         dd.appendChild(doc.createTextNode(t(row.value)));
         if (row.showAge && state.countdownState) {
           var age = state.countdownState.age;
-          var sep = state.lang === 'zh' ? ' ' : '';
+          var sep = state.lang === 'zh' ? '\u00a0' : '';
           dd.appendChild(el('span', 'profile__age', '（' + age + sep + ui('ageSuffix') + '）'));
         }
       }
@@ -285,6 +285,7 @@
       btn.addEventListener('click', function () { openLightbox(index, btn); });
       li.appendChild(btn);
       var caption = el('p', 'gallery__caption');
+      caption.appendChild(el('span', 'gallery__index', pad2(index + 1)));
       caption.appendChild(el('span', 'gallery__caption-text'));
       caption.appendChild(el('span', 'gallery__date'));
       li.appendChild(caption);
@@ -357,8 +358,7 @@
       state.fallbackOpen = true;
       lightbox.setAttribute('open', '');
     }
-    var closeBtn = qs('#lightbox-close');
-    if (closeBtn) { closeBtn.focus(); }
+    lightbox.focus();   // 焦點放在 dialog 本身：會唸出標籤，也不會在點按時出現焦點框
   }
 
   function closeLightbox() {
@@ -478,6 +478,35 @@
     renderAll();
   }
 
+  /* ---------- 導覽列：標示目前所在的區塊 ---------- */
+  function setupNavHighlight() {
+    if (!('IntersectionObserver' in window)) { return; }
+    var links = qsa('.site-nav__list a[href^="#"]');
+    var current = null;
+    function setCurrent(id) {
+      if (id === current) { return; }
+      current = id;
+      links.forEach(function (link) {
+        var on = link.getAttribute('href') === '#' + id;
+        if (on) {
+          link.setAttribute('aria-current', 'true');
+          if (typeof link.scrollIntoView === 'function') {
+            try { link.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'auto' }); } catch (e) { /* 舊瀏覽器 */ }
+          }
+        } else {
+          link.removeAttribute('aria-current');
+        }
+      });
+    }
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) { if (entry.isIntersecting) { setCurrent(entry.target.id); } });
+    }, { rootMargin: '-35% 0px -55% 0px', threshold: 0 });
+    links.forEach(function (link) {
+      var section = doc.getElementById(link.getAttribute('href').slice(1));
+      if (section) { observer.observe(section); }
+    });
+  }
+
   function setupLangSwitch() {
     qsa('.lang-switch__btn').forEach(function (btn) {
       btn.addEventListener('click', function () { setLang(btn.getAttribute('data-lang')); });
@@ -491,6 +520,7 @@
     buildGallery();
     setupLightbox();
     setupLangSwitch();
+    setupNavHighlight();
     renderAll();
     startClock();
     window.addEventListener('hashchange', function () {

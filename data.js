@@ -104,6 +104,7 @@ window.SITE_DATA = {
     lightboxNext:    { ja: '次の写真', zh: '下一張' },
     lightboxCounter: { ja: '{current} / {total}', zh: '{current} / {total}' },
     lightboxHint:    { ja: '← → で切り替え、Esc で閉じる', zh: '← → 切換，Esc 關閉' },
+    lightboxHintTouch: { ja: 'スワイプで切り替え、写真の外をタップで閉じる', zh: '左右滑動切換，點照片外側關閉' },
 
     messagesTitle:   { ja: 'メッセージ', zh: '應援留言' },
     messagesLead:    { ja: 'AYAKAちゃんへ、ささやかな応援の言葉。', zh: '給 AYAKA 的小小應援。' },
@@ -122,7 +123,7 @@ window.SITE_DATA = {
     { label: { ja: '名前',      zh: '姓名' },     value: { ja: 'AYAKA（彩花）', zh: 'AYAKA（彩花）' } },
     { label: { ja: '本名',      zh: '本名' },     value: { ja: '新井 彩花', zh: '新井彩花' } },
     { label: { ja: '生年月日',  zh: '出生日期' }, value: { ja: '2003年6月20日', zh: '2003 年 6 月 20 日' }, showAge: true },
-    { label: { ja: '虹プロジェクト', zh: '虹プロジェクト（Nizi Project）' }, value: { ja: '最終順位 8位', zh: '最終第 8 名' } },
+    { label: { ja: '虹プロジェクト', zh: '虹プロジェクト（Nizi Project）' }, value: { ja: '最終順位 8位', zh: '最終第 8\u00a0名' } },
     { label: { ja: 'デビュー',  zh: '出道' },     value: { ja: '2020年12月、シングル「Step and a step」でNiziUとして正式デビュー', zh: '2020 年 12 月以單曲〈Step and a step〉隨 NiziU 正式出道' } },
     { label: { ja: '出身地',    zh: '出身地' },   value: null },
     { label: { ja: '身長',      zh: '身高' },     value: null },
@@ -141,8 +142,8 @@ window.SITE_DATA = {
       note:  { ja: '本名・新井彩花。', zh: '本名新井彩花。' }
     },
     {
-      date: null,
-      title: { ja: '虹プロジェクト 最終順位8位', zh: '虹プロジェクト（Nizi Project）最終第 8 名' },
+      date: '2020',
+      title: { ja: '虹プロジェクト 最終順位8位', zh: '虹プロジェクト（Nizi Project）最終第 8\u00a0名' },
       note:  { ja: '', zh: '' }
     },
     {

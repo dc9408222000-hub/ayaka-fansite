@@ -166,6 +166,7 @@ node scripts/qa.js http://127.0.0.1:8000/ qa-output
 3. **品質檢查**：`scripts/qa.js` 自動截圖與檢查；`test/` 的倒數邊界測試與資料完整性測試；確認相對路徑在 `/ayaka-fansite/` 子路徑與直接開啟 `index.html` 時都正常。
 4. **載入速度與分享**：WebP 多尺寸（`<picture>`／`srcset`）、Open Graph／Twitter Card 與 `photos/og.jpg`、原創 favicon 與 manifest、`404.html`。
 5. **文件**：本 README。
+6. **審查回饋**：依 `review-design` 分支的設計審查（D-01～D-12）與手機 UX 評審修正：深色模式主視覺日期標籤對比、手機導覽列改為可見的膠囊並加右側淡出提示、手機只固定導覽列、倒數數字流體字級（320px 也不擠）、相簿第一張在手機全寬、燈箱在觸控裝置顯示滑動提示並把關閉鈕放在拇指可及處、主視覺 CTA 改為膠囊按鈕、桌機主視覺高度上限、待補欄位精簡（手機單列、600px 以上兩欄）、年表平板以上三欄、留言卡不拉齊高度、頁尾文字平衡換行、焦點框不改圓角、繁體中文改用台灣字型堆疊。
 
 ## 待確認事項
 
@@ -173,7 +174,7 @@ node scripts/qa.js http://127.0.0.1:8000/ qa-output
 - **初始 commit 的作者信箱**（安全稽核 S-01）：`fa239a6` 的 author email 是個人 Gmail。改寫歷史需要 force push，開發時沒有動；是否要清除由網站主人決定（可先到 GitHub → Settings → Emails 開啟信箱隱私設定）。
 - **分享預覽與 404 頁的網址**：`index.html` 的 `og:url`／`og:image`／`canonical` 與 `404.html` 裡的 `/ayaka-fansite/` 路徑都寫死為 GitHub Pages 的網址；如果之後改用自訂網域，請一併修改。
 - **應援標語與留言**：目前都是範例文字，請換成自己的話（`data.js` 的 `hero.slogan` 與 `messages`）。
-- **個人資料的「待補」欄位**與年表裡「虹プロジェクト」的日期：只放了確認過的資訊，其餘留待補充。
+- **個人資料的「待補」欄位**：只放了確認過的資訊，其餘留待補充（年表「虹プロジェクト 最終順位8位」的年份依網站主人指示填 2020）。
 - `BRIEF.md`、`TASKS.md`、`SECURITY.md` 會和網站一起發布在 GitHub Pages 上（內容沒有機密）；不想讓訪客看到的話可以移到別的分支。
 
 ## 關於
