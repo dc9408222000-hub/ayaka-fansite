@@ -7,6 +7,11 @@
 (function () {
   'use strict';
 
+  // 防止網站被別人用 iframe 嵌入（GitHub Pages 無法設定 X-Frame-Options，改用 JS 偵測後導回最上層）
+  try {
+    if (window.top !== window.self) { window.top.location.href = window.location.href; }
+  } catch (e) { /* 跨網域的 top 無法讀取時會丟錯，忽略即可 */ }
+
   var DATA = window.SITE_DATA;
   var Countdown = window.AyakaCountdown;
   if (!DATA || !Countdown) { return; }
@@ -166,6 +171,8 @@
     if (greetingLead) { greetingLead.textContent = fill(ui('birthdayTodayLead'), { age: s.age }); }
     var countdown = qs('#countdown');
     if (countdown) { countdown.setAttribute('aria-label', ui('countdownLabel')); }
+    var mark = qs('#birthday-mark');
+    if (mark) { mark.textContent = DATA.site.birthday.month + '.' + DATA.site.birthday.day; }
   }
 
   function tick() {

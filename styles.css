@@ -205,11 +205,12 @@ button {
 .brand {
   display: inline-flex;
   align-items: baseline;
-  gap: 0.6em;
+  gap: 0.55em;
   text-decoration: none;
   color: var(--text);
   padding: 8px 0;
 }
+.brand__mark { width: 22px; height: 22px; flex: 0 0 auto; align-self: center; }
 .brand__name {
   font-family: var(--font-display);
   font-weight: 500;
@@ -506,6 +507,7 @@ button {
 .section__inner--narrow { max-width: 760px; }
 .section__head { margin-bottom: var(--space-5); }
 
+.section { counter-increment: section; }
 .eyebrow {
   display: inline-flex;
   align-items: center;
@@ -517,6 +519,13 @@ button {
   text-transform: uppercase;
   color: var(--accent-strong);
   margin-bottom: var(--space-2);
+}
+.eyebrow::after {
+  content: counter(section, decimal-leading-zero);
+  order: -1;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
 }
 .eyebrow::before {
   content: "";
@@ -538,6 +547,24 @@ button {
 
 @media (min-width: 900px) {
   .section { padding: var(--space-7) 0; }
+  .section__inner {
+    display: grid;
+    grid-template-columns: 320px minmax(0, 1fr);
+    gap: var(--space-5) var(--space-6);
+    align-items: start;
+  }
+  .section__inner--narrow { max-width: var(--content); }
+  .section__head {
+    position: sticky;
+    top: calc(var(--header-h) + var(--space-4));
+    margin-bottom: 0;
+    padding-right: var(--space-3);
+  }
+  .section__title { font-size: var(--step-2); letter-spacing: 0.02em; text-wrap: balance; }
+  .section__lead { font-size: var(--step--1); }
+}
+@media (min-width: 1100px) {
+  .section__inner { gap: var(--space-5) var(--space-7); }
 }
 
 /* ---------- 個人資料 ---------- */
@@ -596,6 +623,21 @@ button {
   height: 3px;
   background: var(--rainbow);
 }
+.birthday__mark {
+  position: absolute;
+  right: 16px;
+  top: 10px;
+  font-family: var(--font-display);
+  font-size: 2.75rem;
+  font-weight: 300;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  color: var(--accent);
+  opacity: 0.22;
+  pointer-events: none;
+  user-select: none;
+}
+.birthday { margin-left: 0; }
 .birthday__lead { color: var(--text-muted); font-size: var(--step--1); letter-spacing: 0.04em; }
 .countdown {
   display: grid;
@@ -716,11 +758,20 @@ button {
   object-fit: cover;
   transition: transform 0.5s ease;
 }
+.gallery__item { counter-increment: photo; }
 .gallery__caption {
   display: block;
   margin-top: var(--space-2);
   font-size: var(--step--1);
   line-height: 1.5;
+}
+.gallery__caption-text::before {
+  content: counter(photo, decimal-leading-zero);
+  margin-right: 0.6em;
+  font-family: var(--font-display);
+  font-size: var(--step--2);
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
 }
 .gallery__date {
   display: block;
