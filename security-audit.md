@@ -110,6 +110,7 @@
 - **XSS**：`app.js` 所有寫入畫面都用 `textContent`／`createElement`／`setAttribute`（屬性只有 `src`、`srcset`、`alt`、`width`、`height`、`aria-*`、`datetime`，值都來自 `data.js`）；沒有 `innerHTML`、`outerHTML`、`insertAdjacentHTML`、`document.write`、`eval`、`new Function`、字串形式的 `setTimeout`／`setInterval`。輸入來源：localStorage 的值先用 `LANGS` 白名單檢查（`app.js:19`、`:76`、`:475`），`location.hash` 只做 `=== '#birthday-preview'` 的布林判斷（`app.js:28`、`:497`），沒有讀 query string。動態探針：在 query、hash、localStorage（含壞掉的 JSON、超長字串）注入 `<img onerror>` 都沒有進入 DOM，頁面照常顯示。eslint 的 `detect-object-injection` 警告逐一確認為誤報（key 都來自靜態 HTML 屬性或數字索引）。
 - **第三方資源**：實際載入 `index.html` 與 `404.html` 的所有請求都是同源；沒有外部 script、stylesheet、字型（系統字型堆疊）、iframe、分析工具；CSS 沒有 `url()`／`@import`；`favicon.svg` 沒有 script 或外部參照。唯一的絕對網址是 `og:url`、`og:image`、`twitter:image`、`canonical` 與 `data.js` 的 `site.url`，都指向自己的 Pages 網域。網站沒有任何外部連結，所以 `rel="noopener noreferrer"` 目前沒有適用對象（SECURITY.md 已寫明之後新增時要加）。兩頁都有 `<meta name="referrer" content="no-referrer">`。
 - **資訊外洩**：41 個圖片檔（9 張 JPEG、27 個 WebP、`og.jpg`、4 個 PNG 圖示）逐一檢查，全部沒有 EXIF／GPS／XMP／IPTC／ICC／註解，JPEG 在 EOI 之後沒有多餘資料；`scripts/make_images.py` 用 Pillow 重新編碼且不帶 exif，產出的 WebP／og.jpg 也確認乾淨。沒有 source map、`.env`、金鑰、`node_modules`、lockfile、建置產物、截圖（`qa-output/` 已在 `.gitignore`）。HTML／JS／CSS 註解只有說明文字，沒有本機路徑或帳號。`data.js` 的個人資料只有 BRIEF.md 允許的四項，其餘為 `null`；留言與照片說明沒有個資。`scripts/`、`test/`、`package.json` 會隨 Pages 公開但內容無害。
+- **git 歷史的補充驗證**：`git log --diff-filter=D` 顯示歷史中沒有任何被刪除的檔案；每張 `ayaka-0x.jpg` 在歷史裡只有一個版本（`6be59f0`），不存在先前含 EXIF 的版本可被挖出；27 個 WebP 逐 chunk 檢查只有 VP8 影像資料（沒有 EXIF／XMP／ICCP chunk），4 個 PNG 只有 IHDR／IDAT／IEND；全站 grep 信箱格式、本機路徑（`/home/`、`/Users/`、磁碟機代號）、IP 都沒有命中；除根 commit 外，`main` 與兩個 review 分支的所有 commit 作者都是 noreply 位址。
 - **localStorage**：只有一個鍵 `ayaka-fansite:lang`，讀（`app.js:73-79`）寫（`app.js:80-82`）都在 try/catch 裡，讀出的值不在白名單就回到預設語言；沒有 cookie、sessionStorage、IndexedDB。
 - **依賴**：沒有 commit `node_modules` 或建置產物；devDependencies 的 `npm audit` 結果 0 弱點（見 S-03 的說明）。
 - **其他**：`countdown.js` 的 UMD 寫法在瀏覽器下 `module` 未定義會走 `root.AyakaCountdown`，安全；`#birthday-preview` 只會把倒數顯示成生日當天的畫面，屬於顯示用途，不是安全問題；`manifest.webmanifest` 的 `start_url`／`scope`／icons 都是相對同源路徑。
@@ -120,7 +121,7 @@
 - 之前備註的 `.gitignore` 已在 `cb1cb13` 加入並於 `547ba3c` 補齊（`node_modules/`、`qa-output/`、`.DS_Store` 等）。
 - GitHub 上有一個 `claude/vigilant-heisenberg-8n8cil` 分支，內容與 `main` 相同（開發 session 的工作分支）；稽核結束後可以連同兩個 review 分支一起整理或刪除。
 - **同源共用提醒**：GitHub 專案型 Pages 的來源（origin）是整個 `dc9408222000-hub.github.io`，同帳號之後若再發布其他 Pages 專案，會和本站同源：CSP 的 `'self'` 會允許載入那些專案的 script，localStorage 也共用。目前帳號只有這一個公開 repo，所以沒有問題；以後若新增其他 Pages 專案，請同樣遵守本站的安全基準（沒有 inline、沒有第三方、沒有 innerHTML），否則另一個專案的 XSS 會波及本站。
-- 本報告與 `review-design` 分支的報告都在公開 repo 裡，未修正的問題也會被看到。對純靜態網站來說風險很小。
+- 本報告與 `review-design` 分支的報告都在公開 repo 裡，未修正的問題也會被看到；`TASKS.md` 也直接指向這兩個分支。對純靜態網站來說風險很小。**稽核結束後建議的清理步驟（網站主人自行決定）**：(1) `git rm BRIEF.md TASKS.md` 後 commit、push 到 `main`（內容若還需要，改放 repo 的 Wiki 或私人筆記）；(2) 兩份報告處理完後刪除遠端分支 `git push origin --delete review-security review-design`，連同開發 session 的 `claude/vigilant-heisenberg-8n8cil` 分支；(3) 之後若再做稽核，報告放 private repo 或 GitHub 的 Security advisories（私密），不要放在公開分支。
 
 ## 建議設定（GitHub，請網站主人自行處理）
 
@@ -150,3 +151,4 @@ README 與 SECURITY.md（`547ba3c` 之後）已寫入相同的建議，這裡補
 | 07:34 | `77a7653` | 設計／文案修正（D-13～D-37）。重跑整套工具鏈與 CSP 下的互動測試：沒有新問題，既有結論不變 |
 | 07:34 | `f04b377` | 只改 README（審查狀態摘要）與開發用 `scripts/qa.js`（網頁不載入），網站程式碼未變；不需重跑 |
 | 07:38 | `c1391aa` | 只改 `styles.css` 版面（新增的規則沒有 url()／@import），與安全無關 |
+| 07:38 | `c1391aa` | 多視角工作流的資訊外洩與 localStorage 鏡頭完成：沒有新問題；補上 git 歷史／WebP／PNG 的逐層驗證與稽核結束後的清理步驟 |
