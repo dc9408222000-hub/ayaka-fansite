@@ -2,6 +2,13 @@
 
 BRIEF.md 的網站完成並 push 之後，依序完成以下每一項。每完成一項就 commit 並 push 到 `main`（push 前先 `git pull --rebase origin main`）。中途不用停下來詢問；遇到需要網站主人決定的事，先採用最保守的做法，並記在 README 最後的「待確認事項」。
 
+另外有兩個獨立的審查 session 同時在檢查這個網站，報告放在其他分支（不會改動 `main`）：
+
+- 安全稽核：`origin/review-security` 分支的 `security-audit.md`（編號 S-01…）
+- 質感審查：`origin/review-design` 分支的 `design-review.md`（編號 D-01…）
+
+每完成下面任何一項之後，先執行 `git fetch origin review-security review-design`，用 `git show origin/review-security:security-audit.md` 與 `git show origin/review-design:design-review.md` 讀取報告，修正其中優先度為「高」、狀態為「未處理」的項目，再進行下一項。commit 訊息註明處理了哪些編號（例如 `fix S-03, D-05`）。審查報告的建議如果和事實、版權或安全原則衝突，以這份清單和 BRIEF.md 為準。
+
 ## 1. 質感與內容完整度（最優先）
 
 網站主人希望內容更完整、更有質感。用設計師的眼光重新檢視整個網站，邊截圖邊修改，直到每一區都經得起細看：
@@ -50,3 +57,9 @@ BRIEF.md 的網站完成並 push 之後，依序完成以下每一項。每完�
 ## 6. 最後檢查
 
 - 全部完成後，再跑一次第 3 項的所有檢查，並重新截圖確認第 1 項的質感，確認沒有新問題再 push
+
+## 7. 修正循環（持續到台灣時間 10:45，也就是 UTC 02:45）
+
+- 每 10 分鐘 `git fetch origin review-security review-design`，處理兩份報告中所有狀態為「未處理」的項目（高 → 中 → 低），每批修正都 commit 並 push 到 `main`
+- 暫時沒有未處理項目時，自行繼續提升質感、內容完整度與安全性，並重跑第 3 項的檢查
+- 到了 10:45 就停止新的修改，確認 `main` 是可以正常瀏覽的狀態，並在 README 最後更新改動清單與「待確認事項」
