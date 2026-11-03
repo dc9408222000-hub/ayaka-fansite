@@ -51,6 +51,14 @@ window.SITE_DATA = {
   /* ---------- 介面文字（按鈕、標題、提示等） ---------- */
   ui: {
     skipLink:        { ja: '本文へスキップ', zh: '跳到主要內容' },
+    brandSub:        { ja: '非公式応援サイト', zh: '非官方應援網站' },
+    heroCta:         { ja: 'フォトを見る', zh: '看相簿' },
+    eyebrowProfile:  { ja: 'Profile', zh: 'Profile' },
+    eyebrowBirthday: { ja: 'Birthday', zh: 'Birthday' },
+    eyebrowTimeline: { ja: 'History', zh: 'History' },
+    eyebrowGallery:  { ja: 'Photos', zh: 'Photos' },
+    eyebrowMessages: { ja: 'Message', zh: 'Message' },
+    eyebrowAbout:    { ja: 'About', zh: 'About' },
     langLabel:       { ja: '言語を選択', zh: '選擇語言' },
     langJa:          { ja: '日本語', zh: '日本語' },
     langZh:          { ja: '繁體中文', zh: '繁體中文' },

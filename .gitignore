@@ -1,0 +1,5 @@
+# 本機工具與暫存檔，不要放進網站
+.claude/
+node_modules/
+.DS_Store
+Thumbs.db

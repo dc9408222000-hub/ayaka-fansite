@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests">
+  <meta name="referrer" content="no-referrer">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1a171c" media="(prefers-color-scheme: dark)">
+  <title>AYAKA（彩花）非公式応援サイト</title>
+  <meta name="description" content="NiziUのAYAKA（彩花）を応援する非公式ファンサイト。プロフィール、誕生日カウントダウン、ヒストリー、フォトギャラリー、応援メッセージ。">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main" data-ui="skipLink"></a>
+
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a class="brand" href="#top">
+        <span class="brand__name" data-hero="name"></span>
+        <span class="brand__sub" data-ui="brandSub"></span>
+      </a>
+      <div class="lang-switch" role="group" data-ui-aria-label="langLabel">
+        <button type="button" class="lang-switch__btn" data-lang="ja" aria-pressed="false" data-ui="langJa" lang="ja"></button>
+        <button type="button" class="lang-switch__btn" data-lang="zh" aria-pressed="false" data-ui="langZh" lang="zh-Hant"></button>
+      </div>
+      <nav class="site-nav" data-ui-aria-label="navLabel">
+        <ul class="site-nav__list">
+          <li><a href="#profile" data-ui="navProfile"></a></li>
+          <li><a href="#birthday" data-ui="navBirthday"></a></li>
+          <li><a href="#timeline" data-ui="navTimeline"></a></li>
+          <li><a href="#gallery" data-ui="navGallery"></a></li>
+          <li><a href="#messages" data-ui="navMessages"></a></li>
+          <li><a href="#about" data-ui="navAbout"></a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+
+    <section id="top" class="hero" aria-labelledby="hero-name">
+      <div class="hero__inner">
+        <div class="hero__text">
+          <p class="hero__eyebrow" data-hero="eyebrow"></p>
+          <h1 class="hero__name" id="hero-name">
+            <span class="hero__name-latin" data-hero="name"></span>
+            <span class="hero__name-jp">
+              <span class="hero__name-kanji" data-hero="nameKanji"></span>
+              <span class="hero__name-kana" data-hero="nameKana"></span>
+            </span>
+          </h1>
+          <p class="hero__slogan" data-hero="slogan"></p>
+          <p class="hero__note" data-hero="sloganNote" hidden></p>
+          <p class="hero__cta"><a class="link-arrow" href="#gallery" data-ui="heroCta"></a></p>
+        </div>
+        <figure class="hero__figure">
+          <div class="hero__glow" aria-hidden="true"></div>
+          <div class="hero__frame">
+            <img class="hero__img" id="hero-img" src="photos/ayaka-07.jpg" alt="" width="1280" height="1600" loading="eager" fetchpriority="high" decoding="async">
+          </div>
+          <figcaption class="hero__caption" id="hero-caption"></figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section id="profile" class="section" aria-labelledby="profile-title">
+      <div class="section__inner">
+        <header class="section__head">
+          <p class="eyebrow" data-ui="eyebrowProfile"></p>
+          <h2 class="section__title" id="profile-title" data-ui="profileTitle"></h2>
+          <p class="section__lead" data-ui="profileLead"></p>
+        </header>
+        <dl class="profile" id="profile-list"></dl>
+      </div>
+    </section>
+
+    <section id="birthday" class="section section--soft" aria-labelledby="birthday-title">
+      <div class="section__inner">
+        <header class="section__head">
+          <p class="eyebrow" data-ui="eyebrowBirthday"></p>
+          <h2 class="section__title" id="birthday-title" data-ui="birthdayTitle"></h2>
+        </header>
+        <div class="birthday" id="birthday-box">
+          <div class="birthday__countdown" id="birthday-countdown">
+            <p class="birthday__lead" id="birthday-lead"></p>
+            <div class="countdown" role="timer" aria-live="off" id="countdown">
+              <div class="countdown__tile"><span class="countdown__num" data-unit="days">0</span><span class="countdown__unit" data-ui="unitDays"></span></div>
+              <div class="countdown__tile"><span class="countdown__num" data-unit="hours">0</span><span class="countdown__unit" data-ui="unitHours"></span></div>
+              <div class="countdown__tile"><span class="countdown__num" data-unit="minutes">0</span><span class="countdown__unit" data-ui="unitMinutes"></span></div>
+              <div class="countdown__tile"><span class="countdown__num" data-unit="seconds">0</span><span class="countdown__unit" data-ui="unitSeconds"></span></div>
+            </div>
+            <p class="birthday__until" id="birthday-until"></p>
+          </div>
+          <div class="birthday__today" id="birthday-today" hidden>
+            <p class="birthday__greeting" id="birthday-greeting"></p>
+            <p class="birthday__greeting-lead" id="birthday-greeting-lead"></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="timeline" class="section" aria-labelledby="timeline-title">
+      <div class="section__inner">
+        <header class="section__head">
+          <p class="eyebrow" data-ui="eyebrowTimeline"></p>
+          <h2 class="section__title" id="timeline-title" data-ui="timelineTitle"></h2>
+          <p class="section__lead" data-ui="timelineLead"></p>
+        </header>
+        <ol class="timeline" id="timeline-list"></ol>
+      </div>
+    </section>
+
+    <section id="gallery" class="section section--soft" aria-labelledby="gallery-title">
+      <div class="section__inner">
+        <header class="section__head">
+          <p class="eyebrow" data-ui="eyebrowGallery"></p>
+          <h2 class="section__title" id="gallery-title" data-ui="galleryTitle"></h2>
+          <p class="section__lead" data-ui="galleryLead"></p>
+        </header>
+        <p class="visually-hidden" id="gallery-hint"></p>
+        <ul class="gallery" id="gallery-grid"></ul>
+      </div>
+    </section>
+
+    <section id="messages" class="section" aria-labelledby="messages-title">
+      <div class="section__inner">
+        <header class="section__head">
+          <p class="eyebrow" data-ui="eyebrowMessages"></p>
+          <h2 class="section__title" id="messages-title" data-ui="messagesTitle"></h2>
+          <p class="section__lead" data-ui="messagesLead"></p>
+        </header>
+        <ul class="messages" id="messages-list"></ul>
+      </div>
+    </section>
+
+    <section id="about" class="section section--soft" aria-labelledby="about-title">
+      <div class="section__inner section__inner--narrow">
+        <header class="section__head">
+          <p class="eyebrow" data-ui="eyebrowAbout"></p>
+          <h2 class="section__title" id="about-title" data-ui="aboutTitle"></h2>
+        </header>
+        <div class="prose" id="about-text"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <p class="site-footer__brand" data-hero="name"></p>
+      <p class="site-footer__line" id="footer-disclaimer"></p>
+      <p class="site-footer__line" id="footer-photo"></p>
+      <p class="site-footer__meta" id="footer-updated"></p>
+    </div>
+  </footer>
+
+  <dialog class="lightbox" id="lightbox" data-ui-aria-label="lightboxLabel">
+    <div class="lightbox__bar">
+      <p class="lightbox__counter" id="lightbox-counter"></p>
+      <button type="button" class="lightbox__btn lightbox__btn--close" id="lightbox-close"><span class="visually-hidden" data-ui="lightboxClose"></span></button>
+    </div>
+    <figure class="lightbox__figure">
+      <div class="lightbox__stage" id="lightbox-stage">
+        <img class="lightbox__img" id="lightbox-img" alt="" width="1280" height="1600" decoding="async">
+      </div>
+      <figcaption class="lightbox__caption">
+        <span class="lightbox__caption-text" id="lightbox-caption"></span>
+        <span class="lightbox__caption-date" id="lightbox-date"></span>
+      </figcaption>
+    </figure>
+    <div class="lightbox__nav">
+      <button type="button" class="lightbox__btn lightbox__btn--prev" id="lightbox-prev"><span class="visually-hidden" data-ui="lightboxPrev"></span></button>
+      <p class="lightbox__hint" data-ui="lightboxHint"></p>
+      <button type="button" class="lightbox__btn lightbox__btn--next" id="lightbox-next"><span class="visually-hidden" data-ui="lightboxNext"></span></button>
+    </div>
+  </dialog>
+
+  <noscript>
+    <p class="noscript" lang="ja">このサイトはJavaScriptを使用しています。ブラウザのJavaScriptを有効にしてご覧ください。</p>
+    <p class="noscript" lang="zh-Hant">本網站需要啟用 JavaScript 才能正常顯示。</p>
+  </noscript>
+
+  <script src="data.js"></script>
+  <script src="countdown.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
