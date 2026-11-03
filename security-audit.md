@@ -1,15 +1,15 @@
 # 安全稽核報告（security-audit.md）
 
-- 稽核對象：`origin/main`（目前 commit `fe77dce`；開發 session 於 07:22–07:25 修正 S-02、S-03、S-05 後的版本）
+- 稽核對象：`origin/main`（目前 commit `77a7653`；S-02、S-03、S-05 已於 `8316767`／`33e1c3c` 修正，之後的 commit 都重新驗證過）
 - 本報告所在分支：`review-security`。稽核員只讀 `main`，不修改、不 push `main`
 - 稽核起始：2026-11-04 06:21（台灣時間）；持續到 10:45
-- 最後更新：2026-11-04 07:30（台灣時間）
+- 最後更新：2026-11-04 07:34（台灣時間）
 - 編號規則：S-01、S-02…，編號固定不重複使用；狀態為「未處理／已修正／不適用」
 - 方法：每次 `main` 有新 commit 就把快照匯出到乾淨目錄，跑靜態檢查（grep、本地規則的 semgrep、eslint + no-unsanitized/security 外掛）、圖片中繼資料檢查（Pillow／exifread／JPEG 區段解析，exiftool 在此環境裝不到）、Playwright 實際載入（console 的 CSP 違規、所有請求主機、跨來源 iframe 嵌入測試、URL／hash／localStorage 的 XSS 探針），再由人工逐行讀原始碼確認；另外用多個獨立視角重複找問題並互相反駁，只保留能用證據支持的項目
 
-## 總結（07:30 版；之後若狀態有變會更新，最後一次 push 的版本為準）
+## 總結（07:34 版；之後若狀態有變會更新，最後一次 push 的版本為準）
 
-- 稽核對象：`origin/main` @ `fe77dce`。完整稽核了 `index.html`、`404.html`、`app.js`、`countdown.js`、`data.js`、`styles.css`、`manifest.webmanifest`、`favicon.svg`、41 個圖片檔、`scripts/`、`test/`、`package.json`、`.gitignore`、README／SECURITY.md，以及 git 歷史與 GitHub 設定。
+- 稽核對象：`origin/main` @ `77a7653`。完整稽核了 `index.html`、`404.html`、`app.js`、`countdown.js`、`data.js`、`styles.css`、`manifest.webmanifest`、`favicon.svg`、41 個圖片檔、`scripts/`、`test/`、`package.json`、`.gitignore`、README／SECURITY.md，以及 git 歷史與 GitHub 設定。
 - 雲端 session 額度預計 08:15 用完。開發 session 已於 07:22–07:25 依本報告修正所有可由網站端處理的項目（S-02、S-03、S-05），稽核員已逐項實測確認。
 
 | 嚴重度 | 未處理 | 已修正 | 不適用 |
@@ -101,9 +101,9 @@
 - 具體建議修法：兩個 HTML 的 CSP meta 內容結尾加上 `; require-trusted-types-for 'script'`；SECURITY.md 的 CSP 列補一句說明；日後若真的需要 innerHTML，必須透過 `trustedTypes.createPolicy()` 建立政策並在 CSP 加 `trusted-types <政策名稱>`。
 - 狀態：**已修正**（`33e1c3c`，07:24；目前 `fe77dce`）。驗證：`index.html:6` 與 `404.html:6` 的 CSP 結尾都加上 `; require-trusted-types-for 'script'`，SECURITY.md 補了說明與日後建立政策的做法。在真實 CSP 下實測（Chromium 153）：載入首頁、切換到中文、開燈箱、→ 切換、Esc 關閉，全部正常，`securitypolicyviolation` 事件 0 次、console 0 錯誤，`window.trustedTypes` 已啟用。
 
-## 已檢查、目前沒有發現問題的項目（`fe77dce`；`c203b68` 以來每個 commit 都重跑整套工具鏈，結論不變）
+## 已檢查、目前沒有發現問題的項目（`77a7653`；`c203b68` 以來每個 commit 都重跑整套工具鏈，結論不變）
 
-- **`8316767`、`fe77dce` 新增的程式碼**：被嵌入時的提示（見 S-02）；導覽列目前區塊高亮 `setupNavHighlight()` 只用靜態 `href` 查 `getElementById` 並設定 `aria-current`，沒有 sink；`#birthday-mark` 改用 `data-mark` 屬性＋CSS `content: attr(data-mark)`，不是 inline style；燈箱改為 `dialog.focus()` 與 Tab 循環；都沒有安全影響。
+- **`8316767`、`fe77dce`、`77a7653` 新增的程式碼**：留言卡日中對照 `msg[other]` 的 `other` 由白名單語言推導且仍用 `textContent`；`404.html` 新增的品牌 `<svg>` 只有呈現屬性、沒有 script；被嵌入時的提示（見 S-02）；導覽列目前區塊高亮 `setupNavHighlight()` 只用靜態 `href` 查 `getElementById` 並設定 `aria-current`，沒有 sink；`#birthday-mark` 改用 `data-mark` 屬性＋CSS `content: attr(data-mark)`，不是 inline style；燈箱改為 `dialog.focus()` 與 Tab 循環；都沒有安全影響。
 
 - **CSP**：`index.html:6` 與 `404.html:6` 都有 `default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests`，與基準完全一致，沒有 `'unsafe-inline'`、`'unsafe-eval'`、`*`、`data:`。meta 放在所有 `<link>` 之前。實際載入時 console 沒有任何 CSP 違規；程式用到的功能都在允許範圍內（沒有 fetch／XHR；`new Image()` 預載與 `<picture>` 的 WebP 都是同源；`canvas.toDataURL` 只用來偵測 WebP 支援，不載入資源；manifest 與 icons 同源）。
 - **inline 程式**：HTML 內沒有 inline `<script>`、`<style>`、`style=`、`on*`、`javascript:`（grep 與實際 DOM 檢查都確認）。`index.html` 的 `<svg class="brand__mark">` 只用 `fill`／`stroke` 等呈現屬性，不是 `style` 屬性，CSP 不會擋。
@@ -147,3 +147,4 @@ README 與 SECURITY.md（`547ba3c` 之後）已寫入相同的建議，這裡補
 | 07:22 | `3ea44ac` | 收到額度將於 08:15 用完的通知。寫入總結版、「限制內最好的做法與取捨」、S-04（已修正）、S-05；實測 Trusted Types 不影響功能 |
 | 07:25 | `8316767` | 開發 session 修正 S-02、S-03（commit 訊息「fix S-02, S-03」）。重跑工具鏈驗證：iframe 內只剩說明與連結、npm audit 0 弱點；兩項改為已修正 |
 | 07:30 | `fe77dce` | 開發 session 修正 S-05（`33e1c3c`）＋燈箱 Tab 循環。真實 CSP 下實測零違規，S-05 改為已修正；總結更新為「風險：低」，只剩 S-01 待網站主人決定 |
+| 07:34 | `77a7653` | 設計／文案修正（D-13～D-37）。重跑整套工具鏈與 CSP 下的互動測試：沒有新問題，既有結論不變 |
