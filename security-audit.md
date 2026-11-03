@@ -1,24 +1,25 @@
 # 安全稽核報告（security-audit.md）
 
-- 稽核對象：`origin/main`（目前 commit `f75df84`）
+- 稽核對象：`origin/main`（目前 commit `3ea44ac`；程式碼與 `c203b68` 相同，`3ea44ac` 只改了 README）
 - 本報告所在分支：`review-security`。稽核員只讀 `main`，不修改、不 push `main`
-- 稽核起始：2026-11-04 06:21（台灣時間）；預計持續到 10:45
-- 最後更新：2026-11-04 06:30（台灣時間）
+- 稽核起始：2026-11-04 06:21（台灣時間）；持續到 10:45
+- 最後更新：2026-11-04 07:18（台灣時間）
 - 編號規則：S-01、S-02…，編號固定不重複使用；狀態為「未處理／已修正／不適用」
+- 方法：每次 `main` 有新 commit 就把快照匯出到乾淨目錄，跑靜態檢查（grep、本地規則的 semgrep、eslint + no-unsanitized/security 外掛）、圖片中繼資料檢查（Pillow／exifread／JPEG 區段解析，exiftool 在此環境裝不到）、Playwright 實際載入（console 的 CSP 違規、所有請求主機、跨來源 iframe 嵌入測試、URL／hash／localStorage 的 XSS 探針），再由人工逐行讀原始碼確認；另外用多個獨立視角重複找問題並互相反駁，只保留能用證據支持的項目
 
 ## 總結
 
 > 稽核結束前（10:45 前）會在此填入最終的各嚴重度數量與整體風險評估。
 
-**目前狀態（2026-11-04 06:30）**：`origin/main` 還沒有 `index.html`，網站程式碼尚未推上來，因此 CSP、inline 程式、XSS、第三方資源、點擊劫持、localStorage 等項目還無法稽核。已先完成不需要網站程式碼的項目（照片中繼資料與內容、repo 檔案與歷史、依賴、GitHub 設定）。背景每 3 分鐘檢查一次 `origin/main`，`index.html` 出現後立即做完整稽核，之後每 10 分鐘追蹤一次。
+**目前狀態（07:18）**：網站程式碼已完整稽核。CSP、referrer 政策、無 inline 程式、不載入任何第三方資源、DOM 只用 `textContent`／`createElement` 寫入、localStorage 白名單＋try/catch、所有圖片無中繼資料，這些都符合基準。剩下的問題是：**防止 iframe 嵌入的 JS 實測無效（S-02，中）**，以及兩個低嚴重度項目（S-01 個人 email 在 commit 歷史、S-03 沒有 lockfile 無法 npm audit）。
 
 | 嚴重度 | 未處理 | 已修正 | 不適用 |
 |---|---|---|---|
 | 高 | 0 | 0 | 0 |
-| 中 | 0 | 0 | 0 |
-| 低 | 1 | 0 | 0 |
+| 中 | 1（S-02） | 0 | 0 |
+| 低 | 2（S-01、S-03） | 0 | 0 |
 
-目前風險評估：**低**（尚無網站程式碼；唯一的問題是 commit 歷史中的個人 email，屬於帳號隱私而非網站漏洞）。
+目前風險評估：**低～中**。沒有 XSS、沒有第三方程式碼、沒有資料外洩途徑；S-02 的實際影響受限於網站沒有任何會改變狀態的操作，主要風險是被別的網站整頁框進去冒充。
 
 ## 問題清單
 
@@ -31,32 +32,74 @@
   1. GitHub → Settings → Emails：勾選「Keep my email addresses private」與「Block command line pushes that expose my email」。之後在 GitHub 網頁上做的 commit 會自動改用 `252630514+dc9408222000-hub@users.noreply.github.com`
   2. 本機若會 commit：`git config --global user.email "252630514+dc9408222000-hub@users.noreply.github.com"`
   3. 既有的 `fa239a6` 只能靠改寫歷史（`git filter-repo --mailmap` 或 GitHub 文件「Changing author info」的流程）清掉。這會改變之後所有 commit 的 SHA、需要 force push，會和正在開發的 session 衝突，建議等開發與稽核都結束後，由網站主人自行決定是否要做。如果決定保留歷史不改，請把本項狀態改為「不適用」並註明。
-- 狀態：未處理（需由網站主人處理；開發 session 不應為此 force push `main`）
+- 狀態：未處理（需由網站主人處理；開發 session 不應為此 force push `main`。README 的「待確認事項」已於 `3ea44ac` 列入此項，作法正確）
 
-## 已檢查、目前沒有發現問題的項目
+### S-02　防止 iframe 嵌入的 JS 在跨來源 iframe 內無效，網站仍可被完整嵌入（點擊劫持防護沒有達成）
 
-- **照片中繼資料（`photos/ayaka-01.jpg`～`ayaka-09.jpg`，共 9 張）**：這個環境無法安裝 exiftool（apt 不可用），改用三種方法逐張檢查：Pillow 解析 IFD0／Exif／GPS／Interop 各 IFD 與 `info`（ICC、XMP、註解）、exifread 完整解析、以及直接走訪 JPEG 區段表並掃描字串。結果每張都只有一個 `APP0/JFIF` 區段，沒有 `APP1`（EXIF／XMP）、`APP13`（IPTC／Photoshop）、`APP2`（ICC）、`COM` 註解，EOI 之後也沒有多餘位元組（沒有附加隱藏資料）。尺寸與 `photos.json` 記載一致（1162×1452 與 1280×1600），都是縮圖而非原始檔。GPS 與拍攝資訊確認已去除。
-- **照片內容**：逐張目視，畫面只有本人與活動現場的海報背景，沒有票券、座位號、含個人資訊的 QR 條碼、手機畫面或可辨識的其他觀眾。
-- **repo 檔案與 git 歷史**：`main`、`review-design`、`review-security` 全部歷史裡只有 `README.md`、`BRIEF.md`、`TASKS.md`、各自的 review 說明檔與 `photos/`。沒有 `.env`、金鑰、憑證、source map、`node_modules`、建置產物、編輯器設定檔或 `.DS_Store`；也沒有被刪除過的敏感檔案。
-- **`photos/photos.json`**：只有路徑、日期、日中 alt 文字與尺寸；日期 2026-08-23 是網站主人打算在相簿公開顯示的活動日期。
-- **依賴**：目前沒有 `package.json`，不需要 `npm audit`。
-- **協作者**：只有網站主人（admin）一人，沒有外部協作者。
+- 嚴重度：中
+- 位置：`app.js:10-13`（`if (window.top !== window.self) { window.top.location.href = window.location.href; }` 包在 try/catch 裡）；`SECURITY.md:19`、`SECURITY.md:26`、`README.md:28`、`README.md:151`、`README.md:165`（說明與實際行為不符）；`404.html`（沒有載入任何 script，完全沒有防護，但該頁只有靜態文字）
+- 說明與影響：`cb1cb13` 時完全沒有嵌入防護；`c203b68` 加了上述 JS。但攻擊者嵌入本站時一定是**跨來源** iframe，而 Chromium 會拒絕沒有使用者互動（user activation）的跨來源 top-level 導向。實測（Chromium 153，把 `index.html` 放進另一個 port 的頁面的 `<iframe>`）：console 出現「Unsafe attempt to initiate navigation … The frame attempting navigation is targeting its top-level window, but is neither same-origin with its target nor has it received a user gesture」，丟出的 SecurityError 被 `catch (e) {}` 吞掉，頁面在 iframe 裡照常完整顯示（內文 1483 字、11 張圖片都在，可操作）。`sandbox="allow-scripts allow-same-origin"` 的 iframe 結果相同；`sandbox` 不給 allow-scripts 時 JS 完全不執行，但本站所有內容都由 JS 畫出，所以只會看到主視覺照片與空殼。同一個實驗若先在 iframe 內點一下再導向就會成功，證明差別只在 user activation。結論：目前的防護等於沒有，而 SECURITY.md／README 卻寫成已經防住，會給網站主人錯誤的安全感。實際影響：網站沒有表單、登入或任何會改變狀態的操作，點擊劫持能騙到的只有語言切換和開相簿；比較實際的風險是整站被別人的網頁框進去冒充、蓋廣告或釣魚。因此評為中而非高。
+- 具體建議修法：
+  1. 偵測到被嵌入時，**先把內容藏起來、不要只靠導向**。因為 `app.js` 放在 `</body>` 前，執行時 DOM 已存在，可以在 IIFE 最前面這樣做（全部用 `createElement`／`textContent`，符合 CSP）：
+     ```js
+     if (window.top !== window.self) {
+       try { window.top.location.replace(window.location.href); } catch (e) { /* 跨來源且沒有 user activation 時會失敗 */ }
+       var body = document.body;
+       while (body.firstChild) { body.removeChild(body.firstChild); }
+       var p = document.createElement('p');
+       p.textContent = 'このページは別のサイトに埋め込まれています。／本頁被嵌入在其他網站中。';
+       var a = document.createElement('a');
+       a.href = window.location.href; a.target = '_top'; a.rel = 'noopener';
+       a.textContent = 'AYAKA 応援サイトを開く／開啟網站';
+       body.appendChild(p); body.appendChild(a);
+       return;   // 不再執行後面的 render
+     }
+     ```
+     使用者點連結是有 user activation 的導向，瀏覽器允許；`replace()` 保留當作同源嵌入或某些瀏覽器下的附帶嘗試。
+  2. 把 `SECURITY.md:19`、`:26` 與 `README.md:151`、`:165` 的說明改成實際行為：「被嵌入時隱藏內容並提供開啟連結；GitHub Pages 無法設定 `X-Frame-Options`／`frame-ancestors`，所以無法完全阻止被框，只能讓被框的頁面無法使用」。
+  3. 驗證方式：用另一個 port（例如 `python3 -m http.server 8001`）放一個只有 `<iframe src="http://127.0.0.1:8000/">` 的頁面，打開後 iframe 裡應該只剩那一段文字與連結，點連結後整個視窗跳到本站。可以把這個檢查加進 `scripts/qa.js`。
+- 狀態：未處理（`cb1cb13` 完全沒有防護 → `c203b68` 加了 JS 但實測無效）
+
+### S-03　`package-lock.json` 被 `.gitignore` 排除，`npm audit` 無法執行、安裝不可重現
+
+- 嚴重度：低
+- 位置：`.gitignore:4`；`package.json:11-14`（devDependencies：`axe-core`、`playwright`）
+- 說明與影響：`package.json` 只有兩個開發用套件（品質檢查用，網站本身不需要 npm，訪客不受影響），但 `package-lock.json` 被排除，所以 (1) `npm audit` 在 repo 裡直接執行會失敗（`ENOLOCK`），(2) 每次 `npm install` 都會重新解析版本，拿到的 playwright／axe-core 版本不固定，將來某個新版若有問題也無從比對。影響範圍只有網站主人自己的電腦（執行 QA 時），所以評為低。本輪稽核以暫時產生的 lockfile 執行 `npm audit`：解析到 `playwright 1.64.1`、`playwright-core 1.64.1`、`axe-core 4.14.0`，**0 個已知弱點**。
+- 具體建議修法：
+  1. 從 `.gitignore` 拿掉 `package-lock.json`，執行 `npm install --package-lock-only` 後把 lockfile commit（只有 3 個套件，檔案很小）
+  2. README「測試與品質檢查」加一行 `npm audit`
+  3. GitHub → Settings → Code security 開啟 Dependabot alerts（見「建議設定」）
+- 狀態：未處理
+
+## 已檢查、目前沒有發現問題的項目（`3ea44ac`／`c203b68`）
+
+- **CSP**：`index.html:6` 與 `404.html:6` 都有 `default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests`，與基準完全一致，沒有 `'unsafe-inline'`、`'unsafe-eval'`、`*`、`data:`。meta 放在所有 `<link>` 之前。實際載入時 console 沒有任何 CSP 違規；程式用到的功能都在允許範圍內（沒有 fetch／XHR；`new Image()` 預載與 `<picture>` 的 WebP 都是同源；`canvas.toDataURL` 只用來偵測 WebP 支援，不載入資源；manifest 與 icons 同源）。
+- **inline 程式**：HTML 內沒有 inline `<script>`、`<style>`、`style=`、`on*`、`javascript:`（grep 與實際 DOM 檢查都確認）。`index.html` 的 `<svg class="brand__mark">` 只用 `fill`／`stroke` 等呈現屬性，不是 `style` 屬性，CSP 不會擋。
+- **XSS**：`app.js` 所有寫入畫面都用 `textContent`／`createElement`／`setAttribute`（屬性只有 `src`、`srcset`、`alt`、`width`、`height`、`aria-*`、`datetime`，值都來自 `data.js`）；沒有 `innerHTML`、`outerHTML`、`insertAdjacentHTML`、`document.write`、`eval`、`new Function`、字串形式的 `setTimeout`／`setInterval`。輸入來源：localStorage 的值先用 `LANGS` 白名單檢查（`app.js:19`、`:76`、`:475`），`location.hash` 只做 `=== '#birthday-preview'` 的布林判斷（`app.js:28`、`:497`），沒有讀 query string。動態探針：在 query、hash、localStorage（含壞掉的 JSON、超長字串）注入 `<img onerror>` 都沒有進入 DOM，頁面照常顯示。eslint 的 `detect-object-injection` 警告逐一確認為誤報（key 都來自靜態 HTML 屬性或數字索引）。
+- **第三方資源**：實際載入 `index.html` 與 `404.html` 的所有請求都是同源；沒有外部 script、stylesheet、字型（系統字型堆疊）、iframe、分析工具；CSS 沒有 `url()`／`@import`；`favicon.svg` 沒有 script 或外部參照。唯一的絕對網址是 `og:url`、`og:image`、`twitter:image`、`canonical` 與 `data.js` 的 `site.url`，都指向自己的 Pages 網域。網站沒有任何外部連結，所以 `rel="noopener noreferrer"` 目前沒有適用對象（SECURITY.md 已寫明之後新增時要加）。兩頁都有 `<meta name="referrer" content="no-referrer">`。
+- **資訊外洩**：41 個圖片檔（9 張 JPEG、27 個 WebP、`og.jpg`、4 個 PNG 圖示）逐一檢查，全部沒有 EXIF／GPS／XMP／IPTC／ICC／註解，JPEG 在 EOI 之後沒有多餘資料；`scripts/make_images.py` 用 Pillow 重新編碼且不帶 exif，產出的 WebP／og.jpg 也確認乾淨。沒有 source map、`.env`、金鑰、`node_modules`、lockfile、建置產物、截圖（`qa-output/` 已在 `.gitignore`）。HTML／JS／CSS 註解只有說明文字，沒有本機路徑或帳號。`data.js` 的個人資料只有 BRIEF.md 允許的四項，其餘為 `null`；留言與照片說明沒有個資。`scripts/`、`test/`、`package.json` 會隨 Pages 公開但內容無害。
+- **localStorage**：只有一個鍵 `ayaka-fansite:lang`，讀（`app.js:73-79`）寫（`app.js:80-82`）都在 try/catch 裡，讀出的值不在白名單就回到預設語言；沒有 cookie、sessionStorage、IndexedDB。
+- **依賴**：沒有 commit `node_modules` 或建置產物；devDependencies 的 `npm audit` 結果 0 弱點（見 S-03 的說明）。
+- **其他**：`countdown.js` 的 UMD 寫法在瀏覽器下 `module` 未定義會走 `root.AyakaCountdown`，安全；`#birthday-preview` 只會把倒數顯示成生日當天的畫面，屬於顯示用途，不是安全問題；`manifest.webmanifest` 的 `start_url`／`scope`／icons 都是相對同源路徑。
 
 ## 備註（非問題，供參考）
 
-- `BRIEF.md`、`TASKS.md` 位於 `main` 根目錄，GitHub Pages 會把它們和網站一起發布（例如 `…/ayaka-fansite/TASKS.md` 可直接讀）。內容沒有機密（活動日期本來就會顯示在網站上），但如果不想讓訪客看到製作流程，可以加一個 `_config.yml` 寫 `exclude: [BRIEF.md, TASKS.md]`（Pages 預設用 Jekyll 建置，會尊重這個設定；若之後加了 `.nojekyll` 則此法無效，改把文件移到別的分支）。
-- 之後做品質檢查若會 `npm i puppeteer`，請先加 `.gitignore`（`node_modules/`、截圖檔、`.DS_Store`），避免把 `node_modules` 或截圖 commit 進 `main`。後續稽核會持續檢查這點。
-- 本報告與 `review-design` 分支的報告都在公開 repo 裡，未修正的問題也會被看到。對純靜態網站來說風險很小，但稽核結束後可以考慮刪除兩個 review 分支，或整理成一份已完成的紀錄。
+- `BRIEF.md`、`TASKS.md`、`SECURITY.md` 會隨 GitHub Pages 一起公開；README 的「待確認事項」已說明（內容沒有機密）。現在有 `.nojekyll`，所以 `_config.yml` 的 `exclude` 不再適用，不想公開就只能移到別的分支。
+- 之前備註的 `.gitignore` 已在 `cb1cb13` 加入並於 `547ba3c` 補齊（`node_modules/`、`qa-output/`、`.DS_Store` 等）。
+- GitHub 上有一個 `claude/vigilant-heisenberg-8n8cil` 分支，內容與 `main` 相同（開發 session 的工作分支）；稽核結束後可以連同兩個 review 分支一起整理或刪除。
+- 本報告與 `review-design` 分支的報告都在公開 repo 裡，未修正的問題也會被看到。對純靜態網站來說風險很小。
 
 ## 建議設定（GitHub，請網站主人自行處理）
 
+README 與 SECURITY.md（`547ba3c` 之後）已寫入相同的建議，這裡補上從 API 實際查到的狀態。
+
 | 項目 | 目前狀態 | 建議 |
 |---|---|---|
-| `main` 分支保護 | **未啟用**（API 回報 `protected: false`；`review-*` 分支也未保護） | Settings → Rules → Rulesets → New branch ruleset：目標 `main`，勾選「Block force pushes」與「Restrict deletions」（舊版介面是 Settings → Branches → Add branch protection rule，勾「Do not allow bypassing」下方的「Allow force pushes」保持關閉、「Allow deletions」保持關閉）。不需要勾「Require a pull request」，網站主人仍可直接 push |
+| `main` 分支保護 | **未啟用**（07:18 再查仍為 `protected: false`；`review-*` 分支也未保護） | Settings → Rules → Rulesets → New branch ruleset：目標 `main`，勾選「Block force pushes」與「Restrict deletions」（舊版介面是 Settings → Branches → Add branch protection rule，「Allow force pushes」與「Allow deletions」都保持關閉）。不需要勾「Require a pull request」，網站主人仍可直接 push |
 | 兩步驟驗證（2FA） | 無法從 API 確認 | Settings → Password and authentication → Two-factor authentication，建議用 passkey 或 authenticator app，並下載 recovery codes；同時到 Settings → Sessions 確認沒有陌生裝置 |
-| GitHub Pages：Enforce HTTPS | 無法確認（此稽核環境的 proxy 封鎖 `*.github.io`，之後若能連線會補驗證） | Settings → Pages → 勾選「Enforce HTTPS」；開啟後 `http://` 會 301 轉到 `https://` |
+| GitHub Pages：Enforce HTTPS | 無法確認（此稽核環境的 proxy 封鎖 `*.github.io`；README 說 Pages 尚未開啟） | 開啟 Pages 後立刻到 Settings → Pages 勾選「Enforce HTTPS」；開啟後 `http://` 會 301 轉到 `https://` |
 | Secret scanning／Push protection | 無法從 API 確認 | 公開 repo 可免費開啟：Settings → Code security → 「Secret protection」與「Push protection」設為 Enabled |
-| Dependabot | 無法從 API 確認 | 目前沒有依賴，但建議先開 Settings → Code security → 「Dependabot alerts」，之後若加 `package.json` 會自動提醒 |
+| Dependabot | 無法從 API 確認 | Settings → Code security → 「Dependabot alerts」開啟；配合 S-03 commit lockfile 後才有東西可比對 |
 | Email 隱私 | 初始 commit 帶個人 Gmail（見 S-01） | Settings → Emails → 勾「Keep my email addresses private」與「Block command line pushes that expose my email」 |
 | Actions 權限 | 目前沒有 workflow | 若之後加 GitHub Actions：Settings → Actions → General → Workflow permissions 設為「Read repository contents and packages permissions」 |
 
@@ -64,4 +107,7 @@
 
 | 時間（台灣） | `origin/main` | 動作 |
 |---|---|---|
-| 06:21–06:30 | `f75df84` | 開始稽核；`index.html` 尚未出現。完成照片、repo 歷史、GitHub 設定檢查，寫入 S-01 |
+| 06:21–06:45 | `f75df84` | 開始稽核；`index.html` 尚未出現。完成照片、repo 歷史、GitHub 設定檢查，寫入 S-01 |
+| 06:58 | `cb1cb13` | `index.html` 出現（網站第一版＋首頁排版調整）。完整稽核：CSP／referrer／無 inline／無第三方／XSS 探針全部通過；發現 S-02（當時完全沒有 iframe 嵌入防護） |
+| 07:10 | `c203b68` | TASKS 1–4 完成（SECURITY.md、404、WebP、OG、manifest、package.json）。重新稽核：S-02 有加 JS 但跨來源實測無效；新增 S-03；41 個圖片檔中繼資料全部乾淨；npm audit 0 弱點 |
+| 07:18 | `3ea44ac` | 只有 README 變更（TASKS 5）。報告更新並 push |
