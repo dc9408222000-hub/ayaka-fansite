@@ -122,6 +122,7 @@ body {
 body.is-locked { overflow: hidden; }
 
 img { max-width: 100%; height: auto; display: block; }
+picture { display: contents; }
 
 h1, h2, h3, p, dl, dd, ol, ul, figure { margin: 0; }
 ol, ul { padding: 0; list-style: none; }
@@ -1015,3 +1016,35 @@ button {
   }
   .gallery__btn:hover .gallery__img { transform: none; }
 }
+
+/* ---------- 404 頁 ---------- */
+.notfound-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+}
+.notfound {
+  max-width: 36em;
+  padding: var(--space-6) var(--gutter);
+  text-align: center;
+}
+.notfound__code {
+  font-family: var(--font-display);
+  font-size: 4.5rem;
+  font-weight: 300;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  color: var(--accent);
+}
+.notfound__code::after {
+  content: "";
+  display: block;
+  width: 44px; height: 2px;
+  margin: var(--space-3) auto;
+  border-radius: 2px;
+  background: var(--rainbow);
+}
+.notfound__title { font-size: var(--step-2); font-weight: 600; letter-spacing: 0.04em; }
+.notfound__title + .notfound__title { font-size: var(--step-1); color: var(--text-muted); font-weight: 500; margin-top: var(--space-1); }
+.notfound__text { margin-top: var(--space-3); color: var(--text-muted); }
+.notfound__links { margin-top: var(--space-4); display: flex; justify-content: center; gap: var(--space-4); flex-wrap: wrap; }

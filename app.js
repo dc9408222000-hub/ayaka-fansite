@@ -106,6 +106,29 @@
     });
   }
 
+  /* ---------- 圖片：WebP 版本（<picture>）----------
+     photos/ayaka-01.jpg → photos/ayaka-01-480.webp / -800.webp / -full.webp（scripts/make_images.py 產生） */
+  function webpSrcset(photo) {
+    var stem = String(photo.src).replace(/\.jpe?g$/i, '');
+    var parts = [stem + '-480.webp 480w', stem + '-800.webp 800w'];
+    if (photo.width) { parts.push(stem + '-full.webp ' + photo.width + 'w'); }
+    return parts.join(', ');
+  }
+  function applyWebpSource(source, photo, sizes) {
+    if (!source) { return; }
+    if (DATA.site.webp) {
+      source.setAttribute('type', 'image/webp');
+      source.setAttribute('srcset', webpSrcset(photo));
+      if (sizes) { source.setAttribute('sizes', sizes); }
+    } else {
+      source.removeAttribute('srcset');
+      source.removeAttribute('sizes');
+    }
+  }
+  var SIZES_GALLERY = '(min-width: 900px) 230px, (min-width: 700px) 30vw, 46vw';
+  var SIZES_HERO = '(min-width: 720px) 460px, 92vw';
+  var SIZES_LIGHTBOX = '100vw';
+
   /* ---------- 首頁主視覺 ---------- */
   function renderHero() {
     var img = qs('#hero-img');
@@ -115,6 +138,7 @@
       if (photo.width) { img.setAttribute('width', photo.width); }
       if (photo.height) { img.setAttribute('height', photo.height); }
       img.setAttribute('alt', photoAlt(photo));
+      applyWebpSource(qs('#hero-source'), photo, SIZES_HERO);
     }
     var caption = qs('#hero-caption');
     if (caption) {
@@ -243,6 +267,9 @@
       btn.type = 'button';
       btn.setAttribute('data-index', String(index));
       var frame = el('div', 'gallery__frame');
+      var picture = el('picture');
+      var source = el('source');
+      applyWebpSource(source, photo, SIZES_GALLERY);
       var img = el('img', 'gallery__img');
       img.setAttribute('src', photo.src);
       img.setAttribute('loading', 'lazy');
@@ -250,7 +277,9 @@
       if (photo.width) { img.setAttribute('width', photo.width); }
       if (photo.height) { img.setAttribute('height', photo.height); }
       img.setAttribute('alt', '');
-      frame.appendChild(img);
+      if (DATA.site.webp) { picture.appendChild(source); }
+      picture.appendChild(img);
+      frame.appendChild(picture);
       btn.appendChild(frame);
       btn.setAttribute('aria-describedby', 'gallery-hint');
       btn.addEventListener('click', function () { openLightbox(index, btn); });
@@ -288,6 +317,7 @@
     index = ((index % total) + total) % total;   // 循環
     state.photoIndex = index;
     var photo = DATA.photos[index];
+    applyWebpSource(qs('#lightbox-source'), photo, SIZES_LIGHTBOX);
     if (lbImg.getAttribute('src') !== photo.src) { lbImg.setAttribute('src', photo.src); }
     if (photo.width) { lbImg.setAttribute('width', photo.width); }
     if (photo.height) { lbImg.setAttribute('height', photo.height); }
@@ -295,11 +325,25 @@
     qs('#lightbox-caption').textContent = photoAlt(photo);
     qs('#lightbox-date').textContent = photo.date ? fill(ui('photoCaptionDate'), { date: formatDate(photo.date) }) : '';
     qs('#lightbox-counter').textContent = fill(ui('lightboxCounter'), { current: index + 1, total: total });
-    // 先把前後兩張抓進快取，切換時才不會等
+    // 先把前後兩張抓進快取，切換時才不會等（支援 WebP 的瀏覽器會抓 WebP）
     [index + 1, index - 1].forEach(function (i) {
       var p = DATA.photos[((i % total) + total) % total];
-      if (p && p.src !== photo.src) { var pre = new Image(); pre.src = p.src; }
+      if (!p || p.src === photo.src) { return; }
+      var pre = new Image();
+      if (DATA.site.webp && supportsWebp()) { pre.src = String(p.src).replace(/\.jpe?g$/i, '') + '-full.webp'; }
+      else { pre.src = p.src; }
     });
+  }
+
+  var webpSupport = null;
+  function supportsWebp() {
+    if (webpSupport === null) {
+      try {
+        var c = doc.createElement('canvas');
+        webpSupport = !!(c.getContext && c.getContext('2d')) && c.toDataURL('image/webp').indexOf('data:image/webp') === 0;
+      } catch (e) { webpSupport = false; }
+    }
+    return webpSupport;
   }
 
   function openLightbox(index, trigger) {

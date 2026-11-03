@@ -10,7 +10,27 @@
   <meta name="theme-color" content="#1a171c" media="(prefers-color-scheme: dark)">
   <title>AYAKA（彩花）非公式応援サイト</title>
   <meta name="description" content="NiziUのAYAKA（彩花）を応援する非公式ファンサイト。プロフィール、誕生日カウントダウン、ヒストリー、フォトギャラリー、応援メッセージ。">
+  <!-- 分享預覽（Open Graph / Twitter Card）。網址換了的話，下面的絕對網址也要一起改。 -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="AYAKA（彩花）非公式応援サイト">
+  <meta property="og:title" content="AYAKA（彩花）非公式応援サイト">
+  <meta property="og:description" content="NiziUのAYAKA（彩花）を応援する非公式ファンサイト。プロフィール、誕生日カウントダウン、ヒストリー、フォトギャラリー。">
+  <meta property="og:url" content="https://dc9408222000-hub.github.io/ayaka-fansite/">
+  <meta property="og:image" content="https://dc9408222000-hub.github.io/ayaka-fansite/photos/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="AYAKA（満面の笑顔）">
+  <meta property="og:locale" content="ja_JP">
+  <meta property="og:locale:alternate" content="zh_TW">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="AYAKA（彩花）非公式応援サイト">
+  <meta name="twitter:description" content="NiziUのAYAKA（彩花）を応援する非公式ファンサイト。">
+  <meta name="twitter:image" content="https://dc9408222000-hub.github.io/ayaka-fansite/photos/og.jpg">
+  <link rel="canonical" href="https://dc9408222000-hub.github.io/ayaka-fansite/">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="icons/icon-192.png" type="image/png" sizes="192x192">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -64,7 +84,10 @@
         <figure class="hero__figure">
           <div class="hero__glow" aria-hidden="true"></div>
           <div class="hero__frame">
-            <img class="hero__img" id="hero-img" src="photos/ayaka-07.jpg" alt="" width="1280" height="1600" loading="eager" fetchpriority="high" decoding="async">
+            <picture>
+              <source id="hero-source" type="image/webp" srcset="photos/ayaka-07-480.webp 480w, photos/ayaka-07-800.webp 800w, photos/ayaka-07-full.webp 1280w" sizes="(min-width: 720px) 460px, 92vw">
+              <img class="hero__img" id="hero-img" src="photos/ayaka-07.jpg" alt="" width="1280" height="1600" loading="eager" fetchpriority="high" decoding="async">
+            </picture>
           </div>
           <p class="hero__kana-vertical" aria-hidden="true"><span data-hero="nameKana"></span><span data-hero="name"></span></p>
           <figcaption class="hero__caption" id="hero-caption"></figcaption>
@@ -171,7 +194,10 @@
     </div>
     <figure class="lightbox__figure">
       <div class="lightbox__stage" id="lightbox-stage">
-        <img class="lightbox__img" id="lightbox-img" alt="" width="1280" height="1600" decoding="async">
+        <picture>
+          <source id="lightbox-source" type="image/webp">
+          <img class="lightbox__img" id="lightbox-img" alt="" width="1280" height="1600" decoding="async">
+        </picture>
       </div>
       <figcaption class="lightbox__caption">
         <span class="lightbox__caption-text" id="lightbox-caption"></span>
