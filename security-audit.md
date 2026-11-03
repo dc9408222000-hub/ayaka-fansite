@@ -119,6 +119,7 @@
 - `BRIEF.md`、`TASKS.md`、`SECURITY.md` 會隨 GitHub Pages 一起公開；README 的「待確認事項」已說明（內容沒有機密）。現在有 `.nojekyll`，所以 `_config.yml` 的 `exclude` 不再適用，不想公開就只能移到別的分支。
 - 之前備註的 `.gitignore` 已在 `cb1cb13` 加入並於 `547ba3c` 補齊（`node_modules/`、`qa-output/`、`.DS_Store` 等）。
 - GitHub 上有一個 `claude/vigilant-heisenberg-8n8cil` 分支，內容與 `main` 相同（開發 session 的工作分支）；稽核結束後可以連同兩個 review 分支一起整理或刪除。
+- **同源共用提醒**：GitHub 專案型 Pages 的來源（origin）是整個 `dc9408222000-hub.github.io`，同帳號之後若再發布其他 Pages 專案，會和本站同源：CSP 的 `'self'` 會允許載入那些專案的 script，localStorage 也共用。目前帳號只有這一個公開 repo，所以沒有問題；以後若新增其他 Pages 專案，請同樣遵守本站的安全基準（沒有 inline、沒有第三方、沒有 innerHTML），否則另一個專案的 XSS 會波及本站。
 - 本報告與 `review-design` 分支的報告都在公開 repo 裡，未修正的問題也會被看到。對純靜態網站來說風險很小。
 
 ## 建議設定（GitHub，請網站主人自行處理）
