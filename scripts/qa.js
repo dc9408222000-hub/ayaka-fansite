@@ -75,6 +75,9 @@ async function collectText(page) {
       if (!t) continue;
       const el = n.parentElement;
       if (!el || el.closest('script,style,noscript')) continue;
+      // text explicitly marked as another language (e.g. the bilingual message cards) is intentional
+      const langEl = el.closest('[lang]');
+      if (langEl && langEl !== document.documentElement && langEl.getAttribute('lang') !== document.documentElement.lang) continue;
       out.push(t);
     }
     // attributes that carry text
