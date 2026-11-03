@@ -18,6 +18,8 @@ NiziU 成員 AYAKA（彩花）的非官方粉絲網站。純 HTML / CSS / JavaSc
 | `photos/` | 9 張照片與 `photos.json`（每張照片的日中說明與尺寸） |
 | `favicon.svg` | 原創的小圖示（花朵＋彩虹） |
 | `test/` | 倒數邏輯的測試（`node --test`） |
+| `SECURITY.md` | 安全說明 |
+| `.nojekyll` | 讓 GitHub Pages 直接發布檔案，不經 Jekyll 處理 |
 
 ## 用 GitHub Pages 發布
 
@@ -102,6 +104,19 @@ python3 -m http.server 8000
 ```bash
 node --test
 ```
+
+## 安全說明摘要
+
+網站是純靜態、沒有後端、沒有表單、不收集任何資料，也不載入任何第三方資源。
+每個頁面都有嚴格的 Content-Security-Policy，所有程式與樣式都放在獨立檔案，寫入畫面只用 `textContent`。
+細節請看 [SECURITY.md](SECURITY.md)。
+
+## 帳號安全建議
+
+- GitHub 帳號開啟 **兩步驟驗證**：Settings → Password and authentication → Two-factor authentication（建議用 passkey 或 authenticator app，並保存 recovery codes）。
+- Pages 設定勾選 **Enforce HTTPS**：Settings → Pages。
+- 保護 `main` 分支（禁止 force push 與刪除）：Settings → Rules → Rulesets → New branch ruleset，目標 `main`，勾選「Block force pushes」與「Restrict deletions」。
+- Settings → Emails：勾選「Keep my email addresses private」與「Block command line pushes that expose my email」，避免 commit 帶出個人信箱。
 
 ## 關於
 
