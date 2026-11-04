@@ -1,16 +1,16 @@
 # 安全稽核報告（security-audit.md）
 
-- 稽核對象：`origin/main`（目前 commit `1765183`，JS／HTML 與 `77a7653` 相同，之後只改了 CSS 版面與文件；S-02、S-03、S-05 已於 `8316767`／`33e1c3c` 修正，之後的 commit 都重新驗證過）
+- 稽核對象：`origin/main`（目前 commit `e3b79ee`，JS／HTML 與 `77a7653` 相同，之後只改了 CSS 版面與文件；S-02、S-03、S-05 已於 `8316767`／`33e1c3c` 修正，之後的 commit 都重新驗證過）
 - 本報告所在分支：`review-security`。稽核員只讀 `main`，不修改、不 push `main`
 - 稽核起始：2026-11-04 06:21（台灣時間）；持續到 10:45
-- 最後更新：2026-11-04 08:00（台灣時間）
+- 最後更新：2026-11-04 08:13（台灣時間）
 - 編號規則：S-01、S-02…，編號固定不重複使用；狀態為「未處理／已修正／不適用」
 - 方法：每次 `main` 有新 commit 就把快照匯出到乾淨目錄，跑靜態檢查（grep、本地規則的 semgrep、eslint + no-unsanitized/security 外掛）、圖片中繼資料檢查（Pillow／exifread／JPEG 區段解析，exiftool 在此環境裝不到）、Playwright 實際載入（console 的 CSP 違規、所有請求主機、跨來源 iframe 嵌入測試、URL／hash／localStorage 的 XSS 探針），再由人工逐行讀原始碼確認；另外用多個獨立視角重複找問題並互相反駁，只保留能用證據支持的項目
 
 ## 總結（07:55 版，08:15 額度截止前的最終版；若 session 仍存活會繼續監看並更新，最後一次 push 的版本為準）
 
-- 稽核對象：`origin/main` @ `1765183`（JS／HTML 同 `77a7653`）。完整稽核了 `index.html`、`404.html`、`app.js`、`countdown.js`、`data.js`、`styles.css`、`manifest.webmanifest`、`favicon.svg`、41 個圖片檔、`scripts/`、`test/`、`package.json`、`.gitignore`、README／SECURITY.md，以及 git 歷史與 GitHub 設定。
-- 雲端 session 額度預計 08:15 用完。開發 session 已於 07:22–07:25 依本報告修正所有可由網站端處理的項目（S-02、S-03、S-05），稽核員已逐項實測確認；之後到 `1765183` 為止的 commit 只有 CSS 版面與 README，每一個都重新檢查過。
+- 稽核對象：`origin/main` @ `e3b79ee`（JS／HTML 同 `77a7653`）。完整稽核了 `index.html`、`404.html`、`app.js`、`countdown.js`、`data.js`、`styles.css`、`manifest.webmanifest`、`favicon.svg`、41 個圖片檔、`scripts/`、`test/`、`package.json`、`.gitignore`、README／SECURITY.md，以及 git 歷史與 GitHub 設定。
+- 雲端 session 額度預計 08:15 用完。開發 session 已於 07:22–07:25 依本報告修正所有可由網站端處理的項目（S-02、S-03、S-05），稽核員已逐項實測確認；之後到 `e3b79ee` 為止的 commit 只有 CSS 版面與 README，每一個都重新檢查過。
 - 多視角獨立稽核（CSP、XSS、第三方、資訊外洩、localStorage、工具複核、攻擊者 7 個鏡頭＋既有項目狀態複核）於 07:55 全部完成：所有候選問題都與 S-02／S-03／S-05 相同，沒有額外發現。
 
 | 嚴重度 | 未處理 | 已修正 | 不適用 |
@@ -133,7 +133,7 @@ README 與 SECURITY.md（`547ba3c` 之後）已寫入相同的建議，這裡補
 |---|---|---|
 | `main` 分支保護 | **未啟用**（07:18 再查仍為 `protected: false`；`review-*` 分支也未保護） | Settings → Rules → Rulesets → New branch ruleset：目標 `main`，勾選「Block force pushes」與「Restrict deletions」（舊版介面是 Settings → Branches → Add branch protection rule，「Allow force pushes」與「Allow deletions」都保持關閉）。不需要勾「Require a pull request」，網站主人仍可直接 push |
 | 兩步驟驗證（2FA） | 無法從 API 確認 | Settings → Password and authentication → Two-factor authentication，建議用 passkey 或 authenticator app，並下載 recovery codes；同時到 Settings → Sessions 確認沒有陌生裝置 |
-| GitHub Pages：Enforce HTTPS | 無法確認（此稽核環境的 proxy 封鎖 `*.github.io`；README 說 Pages 尚未開啟） | 開啟 Pages 後立刻到 Settings → Pages 勾選「Enforce HTTPS」；開啟後 `http://` 會 301 轉到 `https://` |
+| GitHub Pages：Enforce HTTPS | README（`e3b79ee`）記載 Pages 已於 06:19 開啟（來源 `main` 根目錄）、github.io 網域強制 HTTPS、07:59 部署成功；此稽核環境的 proxy 封鎖 `*.github.io`，無法親自連線驗證 | 開啟 Pages 後立刻到 Settings → Pages 勾選「Enforce HTTPS」；開啟後 `http://` 會 301 轉到 `https://` |
 | Secret scanning／Push protection | 無法從 API 確認 | 公開 repo 可免費開啟：Settings → Code security → 「Secret protection」與「Push protection」設為 Enabled |
 | Dependabot | 無法從 API 確認 | Settings → Code security → 「Dependabot alerts」開啟；配合 S-03 commit lockfile 後才有東西可比對 |
 | Email 隱私 | 初始 commit 帶個人 Gmail（見 S-01） | Settings → Emails → 勾「Keep my email addresses private」與「Block command line pushes that expose my email」 |
@@ -159,3 +159,4 @@ README 與 SECURITY.md（`547ba3c` 之後）已寫入相同的建議，這裡補
 | 07:48 | `10cf6b6` | 2 個 commit 只改 README 的審查狀態，與安全無關 |
 | 07:55 | `10cf6b6` | 額度截止前最終檢查：`main` 無新 commit；多視角工作流全部完成、無新發現；總結改為最終版並 push |
 | 08:00 | `1765183` | 只改 README（兩份審查結案狀態），與安全無關 |
+| 08:13 | `e3b79ee` | 只改 README：記載 GitHub Pages 已開啟並強制 HTTPS；更新「建議設定」表的 Pages 狀態（此環境仍無法連線驗證） |
