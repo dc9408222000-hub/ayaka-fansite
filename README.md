@@ -185,7 +185,7 @@ npm audit
 
 ## 待確認事項
 
-- **GitHub Pages 尚未開啟**：請依「用 GitHub Pages 發布」的步驟手動開啟（製作環境沒有 Pages API 的權限）。
+- **GitHub Pages 已開啟**（2026-11-04 06:19，來源 `main` 分支根目錄，github.io 網域強制 HTTPS），網址：https://dc9408222000-hub.github.io/ayaka-fansite/ ，07:59 的部署狀態為成功。
 - **初始 commit 的作者信箱**（安全稽核 S-01）：`fa239a6` 的 author email 是個人 Gmail。改寫歷史需要 force push，開發時沒有動；是否要清除由網站主人決定（可先到 GitHub → Settings → Emails 開啟信箱隱私設定）。
 - **分享預覽與 404 頁的網址**：`index.html` 的 `og:url`／`og:image`／`canonical` 與 `404.html` 裡的 `/ayaka-fansite/` 路徑都寫死為 GitHub Pages 的網址；如果之後改用自訂網域，請一併修改。
 - **應援標語與留言**：目前都是範例文字，請換成自己的話（`data.js` 的 `hero.slogan` 與 `messages`）。
