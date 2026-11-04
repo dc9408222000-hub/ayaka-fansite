@@ -1,16 +1,16 @@
 # 安全稽核報告（security-audit.md）
 
-- 稽核對象：`origin/main`（目前 commit `10cf6b6`，JS／HTML 與 `77a7653` 相同，之後只改了 CSS 版面與文件；S-02、S-03、S-05 已於 `8316767`／`33e1c3c` 修正，之後的 commit 都重新驗證過）
+- 稽核對象：`origin/main`（目前 commit `1765183`，JS／HTML 與 `77a7653` 相同，之後只改了 CSS 版面與文件；S-02、S-03、S-05 已於 `8316767`／`33e1c3c` 修正，之後的 commit 都重新驗證過）
 - 本報告所在分支：`review-security`。稽核員只讀 `main`，不修改、不 push `main`
 - 稽核起始：2026-11-04 06:21（台灣時間）；持續到 10:45
-- 最後更新：2026-11-04 07:55（台灣時間）
+- 最後更新：2026-11-04 08:00（台灣時間）
 - 編號規則：S-01、S-02…，編號固定不重複使用；狀態為「未處理／已修正／不適用」
 - 方法：每次 `main` 有新 commit 就把快照匯出到乾淨目錄，跑靜態檢查（grep、本地規則的 semgrep、eslint + no-unsanitized/security 外掛）、圖片中繼資料檢查（Pillow／exifread／JPEG 區段解析，exiftool 在此環境裝不到）、Playwright 實際載入（console 的 CSP 違規、所有請求主機、跨來源 iframe 嵌入測試、URL／hash／localStorage 的 XSS 探針），再由人工逐行讀原始碼確認；另外用多個獨立視角重複找問題並互相反駁，只保留能用證據支持的項目
 
 ## 總結（07:55 版，08:15 額度截止前的最終版；若 session 仍存活會繼續監看並更新，最後一次 push 的版本為準）
 
-- 稽核對象：`origin/main` @ `10cf6b6`（JS／HTML 同 `77a7653`）。完整稽核了 `index.html`、`404.html`、`app.js`、`countdown.js`、`data.js`、`styles.css`、`manifest.webmanifest`、`favicon.svg`、41 個圖片檔、`scripts/`、`test/`、`package.json`、`.gitignore`、README／SECURITY.md，以及 git 歷史與 GitHub 設定。
-- 雲端 session 額度預計 08:15 用完。開發 session 已於 07:22–07:25 依本報告修正所有可由網站端處理的項目（S-02、S-03、S-05），稽核員已逐項實測確認；之後到 `10cf6b6` 為止的 commit 只有 CSS 版面與 README，每一個都重新檢查過。
+- 稽核對象：`origin/main` @ `1765183`（JS／HTML 同 `77a7653`）。完整稽核了 `index.html`、`404.html`、`app.js`、`countdown.js`、`data.js`、`styles.css`、`manifest.webmanifest`、`favicon.svg`、41 個圖片檔、`scripts/`、`test/`、`package.json`、`.gitignore`、README／SECURITY.md，以及 git 歷史與 GitHub 設定。
+- 雲端 session 額度預計 08:15 用完。開發 session 已於 07:22–07:25 依本報告修正所有可由網站端處理的項目（S-02、S-03、S-05），稽核員已逐項實測確認；之後到 `1765183` 為止的 commit 只有 CSS 版面與 README，每一個都重新檢查過。
 - 多視角獨立稽核（CSP、XSS、第三方、資訊外洩、localStorage、工具複核、攻擊者 7 個鏡頭＋既有項目狀態複核）於 07:55 全部完成：所有候選問題都與 S-02／S-03／S-05 相同，沒有額外發現。
 
 | 嚴重度 | 未處理 | 已修正 | 不適用 |
@@ -158,3 +158,4 @@ README 與 SECURITY.md（`547ba3c` 之後）已寫入相同的建議，這裡補
 | 07:45 | `663d1ad` | 3 個 commit（D-52～D-58、D-51 複修）只改 `styles.css` 與 README；新增的 CSS 沒有 url()／@import，與安全無關 |
 | 07:48 | `10cf6b6` | 2 個 commit 只改 README 的審查狀態，與安全無關 |
 | 07:55 | `10cf6b6` | 額度截止前最終檢查：`main` 無新 commit；多視角工作流全部完成、無新發現；總結改為最終版並 push |
+| 08:00 | `1765183` | 只改 README（兩份審查結案狀態），與安全無關 |
